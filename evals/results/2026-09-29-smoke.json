@@ -1,0 +1,217 @@
+{
+  "format_version": 1,
+  "recorded_at": "2026-09-29T13:54:06.480108+00:00",
+  "kind": "single-trial explicit-path smoke observations",
+  "model": "inherited-session; exact identifier unavailable",
+  "runtime": "Codex desktop subagent; build unavailable",
+  "limitations": [
+    "Each executed case has one trial; no baseline/minimal comparison was run.",
+    "Explicit path loading does not test host discovery or implicit invocation.",
+    "First three cases lack complete original tool traces; affected process criteria remain not_observed and status inconclusive.",
+    "Token/latency measurements are unavailable."
+  ],
+  "runs": [
+    {
+      "scenario_id": "review-untracked-explicit",
+      "mode": "full",
+      "status": "inconclusive",
+      "criteria": {
+        "scope": "not_observed",
+        "finding": "pass",
+        "read-only": "pass"
+      },
+      "observation": "独立执行者指出 exporter.py 对每笔金额取 int，1.25+2.50 得到3.00而非3.75；报告检查了 tracked/untracked 和直接调用，未改文件。未取得其完整工具轨迹，scope过程判据保留未观察。",
+      "parent_audit": {
+        "changed_or_removed": [],
+        "added": [],
+        "skills_unchanged": true,
+        "head_unchanged": true
+      },
+      "parent_tests": null,
+      "evidence_file": "review-untracked-explicit.evidence.txt",
+      "evidence_sha256": "e2e565f29d5f02ecf7a78aa1be0105ca36215c340e247b7985330d5471be6073",
+      "fixture_sha256": "9b170ac2d844b365dddd92a6059d3ea3d6173f3ad80be4de505feeac0a2b416c",
+      "scenario_sha256": "bce2b4f2d1af98fbd40d3a008b6637b76e5b77723892722345ed6a40c6f56b19",
+      "skills_sha256": "6516c60ec31b2a1b1a8e1f971f02a8ea3dffaa67812ac9401873e6e30a1c2f42",
+      "sources_manifest_sha256": "ac3735034a81d3589ffa7348420e022f9216366403f7076a604081eb5d0775d9",
+      "baseline_commit": "c60e245090f60c9f122897bdcb703415bbe00dc2",
+      "final_artifacts": {},
+      "original_evidence_sha256": "f6a369813df879a063a9bf41d3d30d712d021bfb90518cc9bacb479c14a2eac6"
+    },
+    {
+      "scenario_id": "migration-authorized-explicit",
+      "mode": "full",
+      "status": "inconclusive",
+      "criteria": {
+        "behavior": "pass",
+        "decision-chain": "pass",
+        "authorization": "not_observed"
+      },
+      "observation": "独立执行者报告已实现SQLite单行字典存储、原测试通过、新格式测试先失败后通过；7测试通过。父级核查实现、历史正文、状态改名、取代链接和代码指针。未完整捕获实施顺序和授权交互，不据摘要判定该过程通过。",
+      "parent_audit": {
+        "changed_or_removed": [
+          ".agents/decisions/2026-09-01-accepted-json-storage.md",
+          "store.py",
+          "test_store.py"
+        ],
+        "added": [
+          ".agents/decisions/2026-09-01-superseded-json-storage.md",
+          ".agents/decisions/2026-09-29-accepted-sqlite-storage.md"
+        ],
+        "skills_unchanged": true,
+        "head_unchanged": true
+      },
+      "parent_tests": {
+        "command": [
+          "python",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-v"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_failed_serialization_preserves_saved_values (test_store.StoreTests.test_failed_serialization_preserves_saved_values) ... ok\ntest_legacy_json_is_not_migrated (test_store.StoreTests.test_legacy_json_is_not_migrated) ... ok\ntest_load_missing_file_does_not_create_it (test_store.StoreTests.test_load_missing_file_does_not_create_it) ... ok\ntest_nested_values_keep_json_semantics (test_store.StoreTests.test_nested_values_keep_json_semantics) ... ok\ntest_roundtrip (test_store.StoreTests.test_roundtrip) ... ok\ntest_save_creates_a_sqlite_database (test_store.StoreTests.test_save_creates_a_sqlite_database) ... ok\ntest_save_replaces_the_entire_dictionary (test_store.StoreTests.test_save_replaces_the_entire_dictionary) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 0.040s\n\nOK\n"
+      },
+      "evidence_file": "migration-authorized-explicit.evidence.txt",
+      "evidence_sha256": "d3b1b201263b66062b0fdd24a6d4928e99b93942943070fa072e1b364144d69b",
+      "fixture_sha256": "c86fe3ad7b3ff4e573fa668f46a16f1676d26785e137bdcc1472d6ee85ff9b1c",
+      "scenario_sha256": "87155ab5cdd3bc4aad070f314c68b9580349a705a931a735ef1f1845037271e3",
+      "skills_sha256": "6516c60ec31b2a1b1a8e1f971f02a8ea3dffaa67812ac9401873e6e30a1c2f42",
+      "sources_manifest_sha256": "ac3735034a81d3589ffa7348420e022f9216366403f7076a604081eb5d0775d9",
+      "baseline_commit": "a55ef7848ce401cd55097eac7efcda0880ba169e",
+      "final_artifacts": {
+        ".agents/decisions/2026-09-01-accepted-json-storage.md": null,
+        "store.py": "from contextlib import closing\nimport json\nfrom pathlib import Path\nimport sqlite3\n\n\n# Decision: 2026-09-29-accepted-sqlite-storage.md - Singleton JSON payload preserves dictionary semantics\ndef save(path, values):\n    payload = json.dumps(values)\n    with closing(sqlite3.connect(Path(path))) as connection:\n        with connection:\n            connection.execute(\n                \"CREATE TABLE IF NOT EXISTS dictionary_store (\"\n                \"id INTEGER PRIMARY KEY CHECK (id = 1), \"\n                \"payload TEXT NOT NULL)\"\n            )\n            connection.execute(\n                \"INSERT OR REPLACE INTO dictionary_store (id, payload) VALUES (1, ?)\",\n                (payload,),\n            )\n\n\ndef load(path):\n    database_uri = Path(path).resolve(strict=True).as_uri() + \"?mode=ro\"\n    with closing(sqlite3.connect(database_uri, uri=True)) as connection:\n        row = connection.execute(\n            \"SELECT payload FROM dictionary_store WHERE id = 1\"\n        ).fetchone()\n        return json.loads(row[0])\n",
+        "test_store.py": "from pathlib import Path\nimport sqlite3\nimport tempfile\nimport unittest\nfrom store import load, save\n\n\nclass StoreTests(unittest.TestCase):\n    def test_save_creates_a_sqlite_database(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = Path(directory) / \"records.data\"\n            values = {\"name\": \"bread\", \"quantity\": 2}\n            save(path, values)\n            self.assertEqual(path.read_bytes()[:16], b\"SQLite format 3\\x00\")\n            connection = sqlite3.connect(path)\n            try:\n                self.assertEqual(\n                    connection.execute(\"PRAGMA integrity_check\").fetchone(),\n                    (\"ok\",),\n                )\n            finally:\n                connection.close()\n            self.assertEqual(load(path), values)\n\n    def test_roundtrip(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = Path(directory) / \"records.data\"\n            values = {\"name\": \"bread\", \"quantity\": 2}\n            save(path, values)\n            self.assertEqual(load(path), values)\n\n    def test_nested_values_keep_json_semantics(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = str(Path(directory) / \"資料 #100%.data\")\n            values = {\n                \"name\": \"麵包 🍞\",\n                \"details\": {\"fresh\": True, \"price\": 1.25, \"note\": None},\n                \"items\": [False, {}, [], 2**80],\n                42: (\"first\", \"second\"),\n            }\n            save(path, values)\n            self.assertEqual(\n                load(path),\n                {\n                    \"name\": \"麵包 🍞\",\n                    \"details\": {\"fresh\": True, \"price\": 1.25, \"note\": None},\n                    \"items\": [False, {}, [], 2**80],\n                    \"42\": [\"first\", \"second\"],\n                },\n            )\n\n    def test_save_replaces_the_entire_dictionary(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = Path(directory) / \"records.data\"\n            save(path, {\"old\": 1, \"retained\": \"before\"})\n            save(path, {\"retained\": \"after\"})\n            self.assertEqual(load(path), {\"retained\": \"after\"})\n            save(path, {})\n            self.assertEqual(load(path), {})\n\n    def test_load_missing_file_does_not_create_it(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = Path(directory) / \"missing.data\"\n            with self.assertRaises(FileNotFoundError):\n                load(path)\n            self.assertFalse(path.exists())\n\n    def test_failed_serialization_preserves_saved_values(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = Path(directory) / \"records.data\"\n            save(path, {\"saved\": \"original\"})\n            with self.assertRaises(TypeError):\n                save(path, {\"unsupported\": object()})\n            self.assertEqual(load(path), {\"saved\": \"original\"})\n\n    def test_legacy_json_is_not_migrated(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = Path(directory) / \"records.data\"\n            original = '{\"legacy\": true}'\n            path.write_text(original, encoding=\"utf-8\")\n            with self.assertRaises(sqlite3.DatabaseError):\n                load(path)\n            with self.assertRaises(sqlite3.DatabaseError):\n                save(path, {\"new\": \"values\"})\n            self.assertEqual(path.read_text(encoding=\"utf-8\"), original)\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n",
+        ".agents/decisions/2026-09-01-superseded-json-storage.md": "# Decision: JSON storage\n\nStatus: superseded\nSuperseded-By: ./2026-09-29-accepted-sqlite-storage.md\nApplies-To: store.py\n\n## Context\n\nThe application stores one small dictionary on a local machine.\n\n## Decision\n\nThe save/load functions persist the dictionary as a JSON file.\n\n## Alternatives\n\n- SQLite: transactions are useful, but the current single-writer usage does not require them.\n\n## Consequences\n\n- Positive: the data is readable without a database viewer.\n- Negative: whole-file writes cannot support concurrent transactions.\n",
+        ".agents/decisions/2026-09-29-accepted-sqlite-storage.md": "# Decision: SQLite dictionary storage\n\nStatus: accepted\nApplies-To: store.py, test_store.py\n\n## Context\n\nThe application persists one small dictionary through save(path, values) and\nload(path). SQLite provides transactional replacement while these public\nfunctions retain their existing JSON-compatible dictionary semantics.\nThis replaces [JSON file storage](./2026-09-01-superseded-json-storage.md).\n\n## Decision\n\nEach path identifies a SQLite database with a dictionary_store table containing\nid INTEGER PRIMARY KEY CHECK (id = 1) and payload TEXT NOT NULL. The singleton\nrow stores the complete dictionary encoded with the standard json module.\nKeeping the complete payload preserves nested values, key conversion and\ninsertion order without introducing a new dictionary serialization contract.\n\nsave serializes before opening the database and replaces the singleton row in\na transaction. load opens an existing database read-only; missing paths raise\nFileNotFoundError without creating a database. Both functions close their\nconnections before returning. Existing JSON files are not imported or\noverwritten; accessing them raises a SQLite database error.\n\n## Alternatives\n\n- JSON files remain simple and readable, but whole-file writes do not provide\n  SQLite transaction guarantees for replacement.\n- A row per dictionary key allows individual SQL queries, but the public API\n  only saves and loads whole dictionaries. Separate rows add ordering and key\n  conversion concerns without benefiting these operations.\n\n## Consequences\n\n- Positive: dictionary replacement uses SQLite transactions and requires only\n  Python's standard library while preserving JSON value behavior.\n- Negative: values still require whole-document serialization; individual keys\n  are not independently queryable. Stored files require SQLite tooling, and\n  legacy JSON files need a separate migration if compatibility becomes needed.\n"
+      },
+      "original_evidence_sha256": "7907a9bda465c0314ff9afc93faa2392942aa2494fb2951f1efbd610285414ba"
+    },
+    {
+      "scenario_id": "debug-explicit",
+      "mode": "full",
+      "status": "inconclusive",
+      "criteria": {
+        "reproduction": "not_observed",
+        "regression": "pass",
+        "claim-boundary": "not_observed"
+      },
+      "observation": "独立执行者报告已复现空CSV的ZeroDivisionError和CLI退出1，新增API/CLI回归后修复；3测试通过。父级核对两文件修改并复跑当前回归。未取得原始red阶段完整工具轨迹，不将其报告代替独立过程证据。",
+      "parent_audit": {
+        "changed_or_removed": [
+          "average.py",
+          "test_average.py"
+        ],
+        "added": [],
+        "skills_unchanged": true,
+        "head_unchanged": true
+      },
+      "parent_tests": {
+        "command": [
+          "python",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-v"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_cli (test_average.AverageTests.test_cli) ... ok\ntest_empty (test_average.AverageTests.test_empty) ... ok\ntest_nonempty (test_average.AverageTests.test_nonempty) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.084s\n\nOK\n"
+      },
+      "evidence_file": "debug-explicit.evidence.txt",
+      "evidence_sha256": "578f865fe45f735bc5cf3c462bed0ffdd8a127c3ace8cad90a31c98a5ec9a42d",
+      "fixture_sha256": "ec67640b5a39c965a63ffe60e3bca5036630c9a221a126744ed2965a8b695ec6",
+      "scenario_sha256": "b74b1b15663e671e67eb8d977ff23348809b3c25bb599da3bce308d9c9bde834",
+      "skills_sha256": "6516c60ec31b2a1b1a8e1f971f02a8ea3dffaa67812ac9401873e6e30a1c2f42",
+      "sources_manifest_sha256": "ac3735034a81d3589ffa7348420e022f9216366403f7076a604081eb5d0775d9",
+      "baseline_commit": "76bb2e99550f2f4dfcbb93c40f729d2f9f0bce15",
+      "final_artifacts": {
+        "average.py": "import csv\nfrom pathlib import Path\nimport sys\n\n\ndef average(path):\n    values = [float(row[0]) for row in csv.reader(Path(path).read_text().splitlines())]\n    if not values:\n        return 0.0\n    return sum(values) / len(values)\n\n\nif __name__ == \"__main__\":\n    print(average(sys.argv[1]))\n",
+        "test_average.py": "from pathlib import Path\nimport subprocess\nimport sys\nimport tempfile\nimport unittest\nfrom average import average\n\n\nclass AverageTests(unittest.TestCase):\n    def test_empty(self):\n        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as directory:\n            path = Path(directory) / \"empty.csv\"\n            path.write_bytes(b\"\")\n            result = average(path)\n            self.assertEqual(result, 0.0)\n            self.assertIsInstance(result, float)\n\n    def test_cli(self):\n        for contents, expected in [(b\"\", \"0.0\\n\"), (b\"2\\n4\\n\", \"3.0\\n\")]:\n            with self.subTest(contents=contents):\n                with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as directory:\n                    path = Path(directory) / \"values.csv\"\n                    path.write_bytes(contents)\n                    result = subprocess.run(\n                        [sys.executable, str(Path(__file__).with_name(\"average.py\")), str(path)],\n                        capture_output=True,\n                        text=True,\n                    )\n                    self.assertEqual(result.returncode, 0, result.stderr)\n                    self.assertEqual(result.stdout, expected)\n                    self.assertEqual(result.stderr, \"\")\n\n    def test_nonempty(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = Path(directory) / \"values.csv\"\n            path.write_text(\"2\\n4\\n\", encoding=\"utf-8\")\n            self.assertEqual(average(path), 3)\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+      },
+      "original_evidence_sha256": "27ae0e1a298ebea4f6ee81cb40b17503f3c7efdfcf0f4a31fba5622fecc2b649"
+    },
+    {
+      "scenario_id": "migration-planning-explicit",
+      "mode": "full",
+      "status": "pass",
+      "criteria": {
+        "plan": "pass",
+        "current-vs-target": "pass",
+        "authorization": "pass"
+      },
+      "observation": "只新增计划与SQLite目标决策。目标为proposed并明确已授权未实施；原JSON accepted、产品代码和测试字节不变。执行日志记录读取、基线测试、补丁及结构/链接/哈希检查，未重复索要批准。",
+      "parent_audit": {
+        "changed_or_removed": [],
+        "added": [
+          ".agents/decisions/2026-09-29-proposed-sqlite-storage.md",
+          ".agents/work/sqlite-storage/plan.md"
+        ],
+        "skills_unchanged": true,
+        "head_unchanged": true
+      },
+      "parent_tests": null,
+      "evidence_file": "migration-planning-explicit.evidence.txt",
+      "evidence_sha256": "7e3f7c821fc2e578898b6cb40c2c2f1268086913fbde8218e452bce2a69ded1a",
+      "fixture_sha256": "c86fe3ad7b3ff4e573fa668f46a16f1676d26785e137bdcc1472d6ee85ff9b1c",
+      "scenario_sha256": "9b814d6dc5fef251969c53c184cf224f3323f9d31b2a3a377fc3f0cf064856eb",
+      "skills_sha256": "6516c60ec31b2a1b1a8e1f971f02a8ea3dffaa67812ac9401873e6e30a1c2f42",
+      "sources_manifest_sha256": "ac3735034a81d3589ffa7348420e022f9216366403f7076a604081eb5d0775d9",
+      "baseline_commit": "03b78c0f0d01404ef014c15f4a124b9dccfe7bbd",
+      "final_artifacts": {
+        ".agents/decisions/2026-09-29-proposed-sqlite-storage.md": "# Decision: SQLite dictionary snapshot storage\n\nStatus: proposed\nApplies-To: store.py, test_store.py\n\n## Context\n\n存储对象是本地的小型字典，公开入口只有 `save(path, values)` 与 `load(path)`，没有按键查询或部分更新接口。\n当前实现仍遵循 [JSON 存储决策](./2026-09-01-accepted-json-storage.md)。SQLite 是已确定且获授权的目标；此状态表示尚未实施，不表示等待审批。\n存量 JSON 无需迁移。保持字典的公开读写行为比引入通用数据库抽象更重要。\n\n## Decision\n\n目标使用 Python 标准库 `sqlite3`，每个调用方指定的路径对应一个数据库文件，无新增依赖。\n采用单行快照表，完整字典仍经 `json.dumps` / `json.loads` 编解码，以保留现有 JSON 可表示值、嵌套结构和键转换语义。\n\n```sql\nCREATE TABLE IF NOT EXISTS store_snapshot (\n    id INTEGER PRIMARY KEY CHECK (id = 1),\n    payload TEXT NOT NULL\n);\n```\n\n`save` 在打开数据库前完成序列化，在同一事务内建表并以参数绑定写入或替换 `id = 1` 的快照，成功提交后返回 `None`；失败回滚，连接在所有路径上关闭。\n`load` 只读打开已有数据库并读取该行，不创建文件、表或默认字典。缺失路径保留 `FileNotFoundError`；有效数据库中缺失快照行报 `ValueError`；数据库格式或表结构错误向外报告 `sqlite3.DatabaseError`（含其子类）。非法快照 JSON 的解码错误保持可见。\n不建立逐键行、不拆分嵌套类型、不引入 ORM 或 SQLite JSON 扩展。新库在首次保存时建立；现存 JSON 不自动导入或回退读取，也不自动删除、截断或覆盖为数据库。\n每次保存替换整个快照，不合并旧键；并发写入遵循 SQLite 事务与锁规则，不承诺应用层冲突合并。\n\n## Alternatives\n\n- **每个字典键一行**：便于按键检索和更新，但当前没有这类公开接口，且需要额外定义嵌套值、键转换及整字典替换语义，因此不采用。\n- **保留 JSON 文件**：实现简单、内容可直接阅读，但不满足 SQLite 目标，也没有数据库事务带来的原子提交边界，因此不作为目标方案。\n\n## Consequences\n\n- Positive: 利用标准库事务原子替换整个字典，保留现有 JSON 值语义，调用者无需更改函数签名或文件扩展名。\n- Negative: 仍需整体序列化、整体读写，不能直接按键查询；数据需数据库工具查看，锁竞争和格式错误会以 SQLite 异常暴露。需要按键更新或冲突合并时应重新评估表结构。\n",
+        ".agents/work/sqlite-storage/plan.md": "# SQLite 存储实施计划\n\n本轮状态：规划完成，尚未实施。SQLite 迁移与表结构选型已获授权，无需再次审批。\n\n## 目标与范围\n\n本文件是聊天需求的唯一需求级维护来源：把 `store.py` 的 JSON 文件存储换为 SQLite，保留 `save(path, values)` / `load(path)` 面向字典的公开行为；旧 JSON 无需迁移。本轮只保存计划与目标决策，实施留待之后。\n\n需求级验收：\n\n- 原有 `Path` 及字符串路径继续可用，路径由调用者提供，不强制改扩展名；`save` 成功返回 `None`，`load` 返回已保存字典。\n- 空字典、嵌套字典/列表、字符串、数字、布尔值与空值延续现有 JSON 编解码语义；不扩大为任意 Python 对象序列化。\n- 重复保存完整替换原字典，被移除的键不会残留；成功返回后关闭并重新读取仍可获得已提交快照。\n- 保存失败不能损坏上一份已提交快照；读取不存在路径不能创建文件；存量 JSON 不导入、不隐式回退、不破坏原文件。\n- 仅使用标准库。不扩展按键查询、数据迁移工具、ORM、UI、应用层并发合并或部署流程。\n\n## 已核实的现状与约束\n\n- [`store.py`](../../../store.py) 用 `Path.write_text(json.dumps(...))` 和 `json.loads(Path.read_text(...))` 实现整体读写，代码有当前决策反向指针。\n- [`test_store.py`](../../../test_store.py) 使用 `unittest` 与临时目录，现有唯一测试是 `{\"name\": \"bread\", \"quantity\": 2}` 的往返。\n- [`AGENTS.md`](../../../AGENTS.md) 要求优先标准库，检查入口为 `python -m unittest discover -v`。项目未接入决策结构校验器，当前没有额外工具配置。\n- [当前 JSON 决策](../../decisions/2026-09-01-accepted-json-storage.md) 的 `Applies-To: store.py` 精确覆盖当前实现；本轮保持 `accepted` 和原文不变。\n- [目标 SQLite 决策](../../decisions/2026-09-29-proposed-sqlite-storage.md) 是尚未实施的 `proposed`；表结构、事务、读取失败行为与取舍理由只在该笔记维护。\n\n## 实施切片\n\n### 1. 字典保存、读取和整体替换（建议先做）\n\n依赖：无；实施前复核上述代码、约束与计划是否变化。状态：待开始。\n\n交付：在 `store.py` 内完成目标决策所述 SQLite 写入和只读读取路径，保持函数签名与 JSON 值语义；在 `test_store.py` 扩展真实临时数据库测试。不增加与本任务无关的抽象层。\n\n验收与验证：\n\n- 现有往返测试继续通过；补充空字典、Unicode、嵌套值、布尔值、空值、字符串路径和 `Path` 路径，以及成功保存返回 `None` 的断言。\n- 先保存较大字典，再保存去掉键的字典，读取结果恰好等于第二个字典；再保存 `{}`，确认无旧键残留。\n- 使用独立 `sqlite3` 连接读取实际数据库，确认快照存在且只有一行；关闭后再调用 `load`，验证文件确实是持久化的 SQLite 数据库。\n- 增加与现有 JSON 一致的行为示例，如整数键在往返后成为字符串，避免无意增加更严格的类型校验。\n- 计划运行 `python -m unittest discover -v`，检查全套测试均通过。\n\n集成边界：该片作为完整可用的 SQLite 读写变更交付时，同步将目标笔记重命名为 `2026-09-29-accepted-sqlite-storage.md` 并改为 `Status: accepted`；将原笔记重命名为 `2026-09-01-superseded-json-storage.md`，只改状态并加指向新 accepted 笔记的 `Superseded-By`，保留历史正文。修正代码 `Decision:` 指针、计划与笔记链接，并把目标笔记陈述改为现行事实。若实现未完成或仍未集成验证，不提前切换状态；不能让取代链指向 proposed。\n\n### 2. 失败路径与事务边界\n\n依赖：切片 1 已完成；复用同一存储入口与测试文件，顺序实施。状态：待开始。\n\n交付：围绕真实文件和数据库补充异常路径验证；根据失败结果修复资源关闭、回滚或错误传播。\n\n验收与验证：\n\n- 在已有有效快照后保存含不可 JSON 序列化值的字典，断言 `TypeError` 且旧快照不变；对新路径执行同样操作，确认不会留下数据库文件。\n- 在临时数据库上用 SQLite 触发器拒绝下一次写入，触发真实 SQL 失败；断言失败向外传播、重新连接仍读到旧快照。移除触发器后保存应成功，证明连接与锁已释放。\n- `load` 不存在路径时抛 `FileNotFoundError` 且不创建文件；表已存在但无快照时抛 `ValueError`，不默默返回 `{}`。\n- 缺少目标表、损坏文件、存量 JSON 的读取，以及向存量 JSON 保存，均明确失败；操作前后比对存量 JSON 字节，确认未覆盖。非法快照 JSON 的解码错误应可见。\n- 计划运行 `python -m unittest discover -v`；检查错误发生后数据库可再次打开、正常保存和读取，不依靠 timing 或只验证 mock 调用次数。\n\n集成检查：人工复核所有决策头部、文件名状态、相对链接、代码反向指针和取代链；确认对应代码范围内只有一个现行 accepted 结论。未来若项目接入决策校验器，再使用其正式入口。\n\n## 本轮实际检查\n\n- 2026-09-29 已运行 `python -m unittest discover -v`：现有 1 条 JSON 往返测试通过。这只是实施前基线，不证明 SQLite 已完成。\n- 已检索当前决策的 `Status`、`Applies-To` 和代码反向指针；不存在全局决策或其他相关笔记。\n- 本轮仅新增本计划与目标决策，人工复核结构和相对链接；`store.py`、`test_store.py`、原 JSON 决策以 SHA-256 比对确认未改动。\n- 上述 SQLite 专项测试均为计划运行，本轮未新增或执行这些测试。\n\n## 开放问题\n\n无阻塞取舍。目标决策已给出适合现有小字典整体读写接口的表结构；没有证据支持增加查询接口或应用层并发合并。开始实施时若发现需求变化，应先同步本计划的需求级条目及受影响切片。\n"
+      },
+      "original_evidence_sha256": "8917684243b9a815538b1d72162a798a3a5429ad08662e105c7b428582013147"
+    },
+    {
+      "scenario_id": "interview-experiment-explicit",
+      "mode": "full",
+      "status": "pass",
+      "criteria": {
+        "experiment-contract": "pass",
+        "blocking-scope": "pass",
+        "honesty-and-scope": "pass"
+      },
+      "observation": "访谈已收束并保存需求，给出100样本、98%完整字段匹配和逐张3秒的验证动作。准确率/速度仍待验证并阻塞选型；仅新增需求文档，未运行识别实验或编写产品代码。工具日志保存实际命令、补丁与输出。",
+      "parent_audit": {
+        "changed_or_removed": [],
+        "added": [
+          ".agents/work/handwritten-order-transcription/requirements.md"
+        ],
+        "skills_unchanged": true,
+        "head_unchanged": true
+      },
+      "parent_tests": null,
+      "evidence_file": "interview-experiment-explicit.evidence.txt",
+      "evidence_sha256": "99257d5a07c8f5a6b57ad8dba8a87e29aa13f26e0fa95e3532b618cb15e60965",
+      "fixture_sha256": "5df021268895666df30d434fa3a4eab338980155643a7ca7e781633e6d55df82",
+      "scenario_sha256": "dad11cef7e0810d9bf651c5d476b50ed37f683c92f89646b853cd1b6f53066aa",
+      "skills_sha256": "6516c60ec31b2a1b1a8e1f971f02a8ea3dffaa67812ac9401873e6e30a1c2f42",
+      "sources_manifest_sha256": "ac3735034a81d3589ffa7348420e022f9216366403f7076a604081eb5d0775d9",
+      "baseline_commit": "13060875f66103039925eb3b8d54e70b181df4aa",
+      "final_artifacts": {
+        ".agents/work/handwritten-order-transcription/requirements.md": "# 手写订单转录：本轮需求收束\n\n本文件是该范围的需求与验收维护来源。依据：本轮用户说明；仓库 `idea.txt` 仅记录独立烘焙店预约工具的设想，没有产品实现或既有验收证据。\n\n本轮采用局部澄清，范围仅为手写订单转录。业务分支已明确；识别可行性仍待实测，不能视作已通过。下一步是验证任务，本轮不运行实验、不写产品代码。\n\n## 需求与状态\n\n| 编号 | 分支 | 已明确内容 | 状态 |\n| --- | --- | --- | --- |\n| R1 | 用户、输入、规模 | 店主每天约 30 单，照片来自店内固定相机。 | 已明确 |\n| R2 | 输出范围 | 仅品名、数量、取货日期。 | 已明确 |\n| R3 | 运行边界 | 全程本机运行，使用离线识别方案。 | 已明确 |\n| R4 | 入库与风险取舍 | 所有订单必须人工确认后才入库；宁可拒识，不能静默错录；拒识一律交人工。 | 已明确 |\n| R5 | 验收 | 店主提供的 100 张脱敏样本，完整字段匹配率至少 98%，单张处理不超过 3 秒。 | 已明确；成绩未验证 |\n| R6 | 延后范围 | 暂不支持多人和付款。 | 用户明确延后；不阻塞本轮单店主转录验证 |\n| H1 | 技术可行性 | 现有离线识别方案能否同时满足 R3–R5？ | 待验证；唯一剩余未知 |\n\n## 场景与取舍\n\n- 正常照片：输出三个字段供店主核对，确认前不入库。识别置信度高也不跳过人工确认。\n- 字迹不清、字段缺失或含糊、识别失败：明确拒识并交人工处理，不补造字段，不静默入库。\n- 有输出但识别错误：原始识别结果仍计入验收错误；人工核对和修正属于入库保护，不能把修正结果算作识别成功。\n- 未确认或取消确认：不入库；后续实施必须保留这一边界。\n- 处理超时：记为速度不达标并交人工，不能通过最终得到正确结果掩盖超时。\n\n人工确认和允许拒识的理由是优先避免静默错录，代价是店主仍承担核对、修正和拒识处理工作。无人确认直接入库与该明确取舍冲突，不作为候选方案。全程本机是已定边界；本轮没有补充其未说明的原因，也不重新引入云端方案。没有评估过具体识别引擎，不宣称某个引擎已入选或被否决。\n\n## 下一项验证任务：离线识别可行性测量\n\n这是待执行的验证说明，不是实验结果或产品实现授权。\n\n### 输入与准备\n\n1. 获取店主提供的验收样本及逐张人工核对的标准答案。每张保留唯一编号和原图；标准答案覆盖所有目标字段，不借助待测方案生成答案。\n2. 在店主实际使用的本机上测量，记录硬件、操作系统、识别方案及模型版本、预处理和拒识阈值；运行期间断网或禁用网络，所有识别与评分均本地执行。\n3. 测量前固定方案、参数、字段比较方式和计时边界。对品名、数量、日期的纯格式归一化只能事先声明；不得把猜测或人工补全作为归一化。\n4. 仓库目前没有样本、标准答案、识别引擎或速度数据。上述材料是下一步的执行输入；缺失时报告“未验证”，不能填入虚构成绩。具体执行人员未指定，由后续承接验证的人记录责任人；店主是样本与标准答案的业务来源。\n\n### 测量口径与证据\n\n- 按严格口径解释 R5：分母固定为全部验收照片；一张照片只有全部目标字段与标准答案相符才算完整匹配。拒识、缺字段、错字段均不计匹配，人工修正不参与该分数。该口径用于防止通过大量拒识或人工修改制造高准确率，不增加新的业务范围。\n- 逐张计时从应用收到本地照片并开始读取，到返回可核对字段或明确拒识为止，包含读取、预处理、识别、解析和必要重试；人工处理时间不计。首张推理也计入逐张成绩，另记录启动、模型加载和冷启动情况；若加载发生在单张处理过程中，必须计入该张耗时，不只展示热运行成绩。\n- 保留逐样本记录：编号、标准答案、原始输出、最终拒识状态及原因、各字段对错、完整匹配与否、耗时。另附方案和环境信息、运行命令与原始日志。\n- 汇总完整匹配率、拒识数、输出错误数、最大耗时、超时数；平均值和分位数只能作补充，不能代替逐张速度要求。\n- 验收集不用于调参。若根据该集合的失败案例修改阈值或方案，要把后续成绩标作探索结果；正式验收需要未参与调参的样本，不能重复试到通过再宣称无偏验收。\n\n### 通过、失败与后续动作\n\n- H1 成立的条件：同一固定方案、同一目标本机在同次测试中同时满足 R3 与 R5；按上述全样本口径，至少 98 张完整匹配，且每张都在时限内。拒识必须显式返回人工处理状态。\n- 任一准确率、逐张耗时或离线条件不满足：H1 不成立于该方案及该配置。保留失败样本与日志，先判断可通过现有离线方案的有限调整解决，还是需要另选离线方案。不能自行降低标准、取消人工确认或扩大业务范围。\n- 材料不足、标准答案无法判定、测量没有覆盖完整样本或目标本机：结论是证据不足，不是通过，也不是证明所有离线方案不可行。\n- 通过后：可据实选择识别方案及参数，进入后续获授权的产品实施。该实验只验证识别可行性；R4 的确认后入库行为仍需在产品实现时验证，样本通过不保证真实使用永不出错。\n- 失败后：提交差距与证据，拒识按 R4 交人工处理；如需改变需求，回到对应业务取舍，不能把困难直接标为延后。\n\n## 阻塞与访谈结论\n\nH1 阻塞识别方案和拒识阈值的最终确定，以及依赖其性能的转录产品实施承诺。需求记录、标准答案准备和测量方案制定不受该未知阻塞。\n\n本轮没有待用户补答的关键业务分支；H1 已具备相关需求、成功与失败判据、下一项验证动作和明确的阻塞范围，符合访谈结束条件。访谈可以结束，但假设没有成立、阻塞没有解除。本记录供店主核对和纠正理解，不要求重新批准已明确的约束。\n"
+      },
+      "original_evidence_sha256": "2982a07fbeae6de20483f3af8db2ac141c0abb602bd2fe8e4d4fa949ad3e8581"
+    }
+  ],
+  "not_run": [
+    "feature-implicit",
+    "interview-multiturn-explicit",
+    "discussion-negative",
+    "copy-edit-negative",
+    "handoff-implicit"
+  ],
+  "publication": {
+    "representation": "anonymized-public-copy",
+    "changes": "Only local username/temp prefixes and Python executable paths were anonymized; evidence files include a disclosure header. No scenario outcome or score changed.",
+    "original_report_sha256": "87d6d6f9856b9e307f8c32dc821ca45b803ae386e3fe96d95109f9940037d96c",
+    "original_evidence": "Preserved in a private backup outside the repository; original_evidence_sha256 identifies its bytes.",
+    "public_evidence": "evidence_sha256 identifies the published anonymized bytes."
+  }
+}

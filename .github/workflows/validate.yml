@@ -1,0 +1,38 @@
+name: Validate skills package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.12']
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install validation dependencies
+        run: python -m pip install -r scripts/requirements.txt
+      - name: Validate skills and package links
+        run: python -B -X utf8 scripts/validate.py --json
+      - name: Test validation and evaluation tools
+        run: python -B -X utf8 -m unittest discover -s tests -v
+      - name: Check whitespace and unexpected tracked edits
+        run: git diff --exit-code --check

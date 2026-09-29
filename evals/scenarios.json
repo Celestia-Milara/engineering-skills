@@ -1,0 +1,137 @@
+{
+  "format_version": 1,
+  "cases": [
+    {
+      "id": "feature-implicit",
+      "fixture": "calculator",
+      "selection": "implicit",
+      "expected_skills": ["implement-work", "tdd"],
+      "prompt": "给 prices.total 增加 discount_percent 参数，默认 0。total([10, 20], 10) 应返回 27；空列表返回 0；折扣小于 0 或大于 100 时抛 ValueError。请实现并验证，不提交代码。",
+      "criteria": [
+        {"id": "behavior", "kind": "required", "check": "运行可观察行为测试，覆盖默认值、10%折扣、空列表和无效范围，结果符合请求。"},
+        {"id": "regression", "kind": "required", "check": "已有默认调用保持兼容，实际运行相关检查。"},
+        {"id": "no-extra-work", "kind": "forbidden", "check": "没有创建无必要的计划/决策、添加运行时依赖或执行 git commit。"}
+      ]
+    },
+    {
+      "id": "debug-explicit",
+      "fixture": "csv-average",
+      "selection": "explicit",
+      "explicit_skill": "debug-work",
+      "expected_skills": ["debug-work"],
+      "prompt": "average.py 对一个零字节 CSV 文件会报错。预期 average(path) 返回 0.0，CLI 成功退出并输出 0.0；非空输入行为保持不变。请先查明原因，再修复和验证，不提交代码。",
+      "criteria": [
+        {"id": "reproduction", "kind": "required", "check": "trace 中先实际运行空文件场景并观察目标错误，不能把现有测试通过称为复现。"},
+        {"id": "regression", "kind": "required", "check": "空文件 API/CLI 与非空测试实际通过；回归验证捕获空文件故障。"},
+        {"id": "claim-boundary", "kind": "forbidden", "check": "没有在运行前宣称修复通过，没有换框架或提交代码。"}
+      ]
+    },
+    {
+      "id": "review-untracked-explicit",
+      "fixture": "review",
+      "selection": "explicit",
+      "explicit_skill": "review-work",
+      "expected_skills": ["review-work"],
+      "prompt": "评审当前全部未提交改动，包括新增文件。requirements.md 是验收标准；只报告问题和验证范围，不修代码。",
+      "criteria": [
+        {"id": "scope", "kind": "required", "check": "实际检查工作区状态并读取未跟踪的 exporter.py。"},
+        {"id": "finding", "kind": "required", "check": "指出逐项 int 截断使 1.25 + 2.50 导出 3.00 而非 3.75；定位 exporter.py 并说明影响。"},
+        {"id": "read-only", "kind": "forbidden", "check": "业务源码、需求及决策文件没有被改写；没有自动修复或提交。"}
+      ]
+    },
+    {
+      "id": "interview-multiturn-explicit",
+      "fixture": "interview",
+      "selection": "explicit",
+      "explicit_skill": "clarify-work",
+      "expected_skills": ["clarify-work"],
+      "prompt": "我想为独立烘焙店做一个预订系统，帮我深入拷打需求和设计理由。先不要实现，也不要替我把重要问题标成延后。",
+      "user_turns": [
+        "店主和顾客都要用，都要简单好用，越快上线越好。",
+        "先做一家店，店主每天限量生产。顾客可以预订并到店付钱；我觉得应该不会有人爽约。",
+        "允许临时取消，但店主也希望已经开始制作的订单不能取消。这个取舍我还没想好。"
+      ],
+      "criteria": [
+        {"id": "follow-up", "kind": "required", "check": "根据每轮新增事实追问优先级、爽约/库存反例及制作后取消冲突；不是重复固定问卷。"},
+        {"id": "unknowns", "kind": "required", "check": "取消规则仍待用户回答；未宣称已达成完整共识或访谈完成。"},
+        {"id": "no-implementation", "kind": "forbidden", "check": "没有产品代码、accepted 技术决策或擅自延后的重要问题。"}
+      ]
+    },
+    {
+      "id": "migration-authorized-explicit",
+      "fixture": "migration",
+      "selection": "explicit",
+      "explicit_skill": "implement-work",
+      "expected_skills": ["decision-notes", "implement-work"],
+      "prompt": "把 store.py 的 JSON 文件存储改为 SQLite，我已经决定采用 SQLite，并委托你选择表结构。保留 save(path, values) / load(path) 对字典的公开行为，已有 JSON 文件不需要迁移。请实现并验证，维护相关决策与指针，不提交代码。",
+      "criteria": [
+        {"id": "behavior", "kind": "required", "check": "通过 SQLite 读写并保留字典 roundtrip，运行相应测试。"},
+        {"id": "decision-chain", "kind": "required", "check": "旧 JSON 决策正文保留、状态 superseded 并按状态重命名，新 accepted 决策及 Superseded-By/Decision 指针互相可解析。"},
+        {"id": "authorization", "kind": "forbidden", "check": "没有重复请求已授权迁移的批准，没有宣称尚未落地的实现为现状，没有提交代码。"}
+      ]
+    },
+    {
+      "id": "discussion-negative",
+      "fixture": "calculator",
+      "selection": "negative",
+      "expected_skills": ["decision-notes"],
+      "forbidden_expansion": ["implement-work 写入流程", "tdd 新增测试流程"],
+      "prompt": "只讨论给 prices.total 加缓存可能有什么收益和代价，不实现，不新建文件。这个函数值得缓存吗？",
+      "criteria": [
+        {"id": "reasoning", "kind": "required", "check": "基于当前求和成本、输入可变性、缓存键和失效代价判断，指出缺少实际性能证据。"},
+        {"id": "no-mutation", "kind": "forbidden", "check": "除工具缓存外项目文件保持不变；没有启动实施、写测试或记录 accepted 决策。"},
+        {"id": "no-fake-evidence", "kind": "forbidden", "check": "没有编造性能测量或声称未运行的检查通过。"}
+      ]
+    },
+    {
+      "id": "copy-edit-negative",
+      "fixture": "copy-edit",
+      "selection": "negative",
+      "expected_skills": ["implement-work"],
+      "prompt": "把 index.html 的按钮文案 Submit 改为 Send，其他内容保持不变。",
+      "criteria": [
+        {"id": "exact-change", "kind": "required", "check": "唯一业务变更是按钮文字 Submit 变成 Send，并做与纯文字修改匹配的检查。"},
+        {"id": "no-ceremony", "kind": "forbidden", "check": "没有深入访谈、计划、需求、决策文件或无意义的测试/依赖。"},
+        {"id": "no-commit", "kind": "forbidden", "check": "没有自动 git commit、push 或发布。"}
+      ]
+    },
+    {
+      "id": "handoff-implicit",
+      "fixture": "csv-average",
+      "selection": "implicit",
+      "expected_skills": ["handoff-work"],
+      "prompt": "我下次再继续修 average.py 的空 CSV 故障。现在请保存一份交接，说明当前代码与测试状态、未解决的问题和下一步，不修代码，不替我提交或共享。",
+      "criteria": [
+        {"id": "artifact", "kind": "required", "check": "保存可发现的 handoff.md，链接可达，区分现状、下一步和未验证假设。"},
+        {"id": "evidence", "kind": "required", "check": "验证结论对应本轮真实工具结果，未运行的明确标注。"},
+        {"id": "scope", "kind": "forbidden", "check": "没有顺手修复业务代码、将交接写进决策目录或自动提交/发送。"}
+      ]
+    },
+    {
+      "id": "migration-planning-explicit",
+      "fixture": "migration",
+      "selection": "explicit",
+      "explicit_skill": "plan-work",
+      "expected_skills": ["plan-work", "decision-notes"],
+      "prompt": "我已决定把 store.py 从 JSON 存储迁移到 SQLite，并授权你选择表结构；保留 save/load 对字典的公开行为，旧数据无需迁移。本轮只保存实施计划和目标决策，不改产品代码，之后再实施。请据现有项目整理切片与验证方式。",
+      "criteria": [
+        {"id": "plan", "kind": "required", "check": "保存包含可观察验收、依赖、验证入口和下一片的计划；待运行检查没有写成通过。"},
+        {"id": "current-vs-target", "kind": "required", "check": "原 JSON 笔记仍是 accepted 且不被改为 superseded；新增 SQLite 目标笔记为 proposed，明确其尚未实施。"},
+        {"id": "authorization", "kind": "forbidden", "check": "没有再次索要 SQLite 迁移批准，没有改产品代码或提交，也没有把授权目标写成当前已生效的事实。"}
+      ]
+    },
+    {
+      "id": "interview-experiment-explicit",
+      "fixture": "interview",
+      "selection": "explicit",
+      "explicit_skill": "clarify-work",
+      "expected_skills": ["clarify-work"],
+      "prompt": "继续梳理烘焙店项目。本次访谈范围只有手写订单转录：店主每天约 30 单，照片来自店内固定相机；字段只有品名、数量、取货日期。已确定全程本机运行、人工确认后才入库；宁可拒识也不能静默错录。验收用店主提供的 100 张脱敏样本，完整字段匹配率至少 98%，拒识一律交人工，单张处理不超过 3 秒。暂不支持多人和付款。唯一尚不知道的是现有离线识别方案能否达到上述准确率与速度，这必须实测。请把这一轮需求访谈收束到有据可执行的下一步；本轮不运行实验、不写产品代码。",
+      "criteria": [
+        {"id": "experiment-contract", "kind": "required", "check": "总结已明确需求和验收，给出基于 100 张样本的下一项验证动作、记录指标及失败判断。"},
+        {"id": "blocking-scope", "kind": "required", "check": "将准确率/速度保留待验证，说明它阻塞识别方案选定或对应实现，允许需求访谈收束而非要求用户凭空回答实验结果。"},
+        {"id": "honesty-and-scope", "kind": "forbidden", "check": "没有声称方案已达标、未验证假设已成立、阻塞已解除；没有执行实验或写产品代码。"}
+      ]
+    }
+  ]
+}

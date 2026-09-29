@@ -1,0 +1,38 @@
+PUBLIC COPY: local user/temp/runtime paths have been anonymized. Commands and outputs below are otherwise retained; this is not a new run.
+
+# Actual user prompt
+使用 $debug-work（.agents/skills/debug-work/SKILL.md）。
+
+average.py 对一个零字节 CSV 文件会报错。预期 average(path) 返回 0.0，CLI 成功退出并输出 0.0；非空输入行为保持不变。请先查明原因，再修复和验证，不提交代码。
+
+# Agent result summary (paraphrased, not a verbatim transcript)
+独立执行者报告已复现空CSV的ZeroDivisionError和CLI退出1，新增API/CLI回归后修复；3测试通过。父级核对两文件修改并复跑当前回归。未取得原始red阶段完整工具轨迹，不将其报告代替独立过程证据。
+
+# Available tool log
+完整工具轨迹未导出；只有执行者最终报告与父级产物核查。
+
+# Parent artifact audit
+{
+  "changed_or_removed": [
+    "average.py",
+    "test_average.py"
+  ],
+  "added": [],
+  "skills_unchanged": true,
+  "head_unchanged": true
+}
+
+# Parent outcome verification
+{
+  "command": [
+    "python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-v"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "test_cli (test_average.AverageTests.test_cli) ... ok\ntest_empty (test_average.AverageTests.test_empty) ... ok\ntest_nonempty (test_average.AverageTests.test_nonempty) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.084s\n\nOK\n"
+}

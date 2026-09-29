@@ -1,0 +1,243 @@
+PUBLIC COPY: local user/temp/runtime paths have been anonymized. Commands and outputs below are otherwise retained; this is not a new run.
+
+# Actual user prompt
+使用 $plan-work（.agents/skills/plan-work/SKILL.md）。
+
+我已决定把 store.py 从 JSON 存储迁移到 SQLite，并授权你选择表结构；保留 save/load 对字典的公开行为，旧数据无需迁移。本轮只保存实施计划和目标决策，不改产品代码，之后再实施。请据现有项目整理切片与验证方式。
+
+# Agent result summary (paraphrased, not a verbatim transcript)
+只新增计划与SQLite目标决策。目标为proposed并明确已授权未实施；原JSON accepted、产品代码和测试字节不变。执行日志记录读取、基线测试、补丁及结构/链接/哈希检查，未重复索要批准。
+
+# Available tool log
+COMMAND:
+Get-Content -LiteralPath 'C:\TEMP\engineering-skills-migration-planning-explicit-full-r_7vpgtd\prompt.txt' -Raw
+RESULT:
+{
+  "chunk_id": "0fefe7",
+  "wall_time_seconds": 0.4597375,
+  "exit_code": 0,
+  "original_token_count": 106,
+  "output": "[ERROR] - (starship::print): Under a 'dumb' terminal (TERM=dumb).\n\r\n使用 $plan-work（.agents/skills/plan-work/SKILL.md）。\r\n\r\n我已决定把 store.py 从 JSON 存储迁移到 SQLite，并授权你选择表结构；保留 save/load 对字典的公开行为，旧数据无需迁移。本轮只保存实施计划和目标决策，不改产品代码，之后再实施。请据现有项目整理切片与验证方式。\r\n\r\n"
+}
+
+COMMAND:
+Get-Content -LiteralPath '.agents/skills/plan-work/SKILL.md' -Raw
+rg --files --hidden -g '!\.git' -g '!*cache*' .
+RESULT:
+{
+  "chunk_id": "475a75",
+  "wall_time_seconds": 0.4613426,
+  "exit_code": 0,
+  "original_token_count": 1362,
+  "output": "[ERROR] - (starship::print): Under a 'dumb' terminal (TERM=dumb).\n\r\n---\nname: plan-work\ndescription: 把已讨论清楚的功能、重构或迁移整理成带验收标准和依赖关系的实施计划。适用于跨模块、多步骤或跨会话工作；小而明确的改动直接实现。\n---\n\n# Plan Work\n\n计划描述要交付的行为和验证方式，篇幅随复杂度增加。不要把计划写成另一套长期决策记录。\n\n## 建立输入\n\n读取用户给出的需求、已有计划及相关代码、测试。按 [decision-notes](../decision-notes/SKILL.md) 检索约束，使用项目现有术语。已经知道的事实不再访谈；只有影响范围或正确性的未知项才询问，其他假设明确列出。\n\n若用户要你保存计划，复用当前任务已有文件；无既有位置时写入 `.agents/work/<主题>/plan.md`。用户只要求简短规划时可以在回复中给出。已有工单是输入和引用来源，不要求安装或配置工单平台。\n\n范围和需求级验收只保留一个维护来源，优先使用已有需求文档或工单；只有聊天输入时可在回复或计划中保留一份简明要求，不另建需求文件。已有独立需求来源时，计划引用相应条目，只补充切片级验收和执行安排。用户调整需求时，按已有写入授权同步需求来源，再更新受影响的切片；暂未同步的来源注明差异，不能继续当成最新要求。\n\n## 最小计划\n\n根据任务保留有用的字段，不用填空式扩写：\n\n- **目标与范围**：简述要解决的问题和本次边界，详细需求引用维护来源。\n- **验收行为**：引用需求级验收，补充各切片可观察、可判断的正常路径及有意义的异常路径；不用凑长篇 user stories。\n- **现有约束**：相关决策笔记的链接，兼容性或迁移边界；拟议选择标为待定，不能冒充现行事实。\n- **实施切片**：每片交付什么、怎样验证、真正的前置依赖。\n- **验证方式**：从现有工具配置确认命令和测试入口。未运行的写“计划运行”，不写“通过”。\n- **开放问题**：只列会影响执行的问题，并说明阻塞哪一片。\n\n可写已核实的文件路径以便定位；路径是导航信息，执行前仍要复核。技术理由引用决策笔记，避免在两个地方同时维护。\n\n## 切片原则\n\n优先每片完成一条可观察的行为路径，贯穿它实际需要的层。不存在 UI 的项目无需添加 UI 步骤。每片应能独立验证，通常能在一次工作会话内完成。\n\n不要默认拆成“全部数据库 → 全部后端 → 全部前端”。前置整理仅在确实降低本次实现成本时安排，范围要小，保持行为不变。\n\n## 3–4 人协作时\n\n只有需要多人接手的切片才补充负责人、共享位置和交付状态。负责人来自用户或已有任务分配，不虚构同事或擅自指派；未知时写待分配。\n\n每片写清验收、依赖和交接入口。可使用待开始、进行中、受阻、完成四种简单状态，也可沿用现有工具状态；“完成”必须指明是本地实现完成还是已集成通过。\n\n并行工作只有在依赖真实解除或接口契约已明确时才能开始。对 TS / Python 跨端接口，先明确字段、空值、错误、版本兼容和验证方式；引用已有 schema 或接口文件，不在每片复制一份。改变共享接口、数据库或基础配置时，标出受影响任务与集成先后顺序。\n\n让有依赖的切片引用同一份计划或已有 issue。不要同时维护本地清单和另一套工单状态；需要团队读取时选择仓库中纳入版本控制的位置或现有共享工具。规划本身不授权创建外部工单或通知同事。\n\n大范围机械迁移可采用“增加兼容形式 → 分批迁移调用方 → 移除旧形式”。指出哪些阶段可以独立保持检查通过；不能独立通过的必须有明确集成和验证点，不能假装每片都可单独交付。依赖不能形成环。\n\n## 交付\n\n给出建议先做的切片、计划位置和仍阻塞的取舍。不要自动发布工单、提交代码或开始实施仅规划的任务。用户已委托规划并实现时，计划完成后直接执行已明确且未被阻塞的切片。\n\r\n.\\test_store.py\n.\\store.py\n.\\AGENTS.md\n.\\.gitignore\n.\\.agents\\skills\\tdd\\tests.md\n.\\.agents\\skills\\tdd\\SKILL.md\n.\\.agents\\skills\\tdd\\mocking.md\n.\\.agents\\skills\\tdd\\LICENSE\n.\\.agents\\skills\\review-work\\SKILL.md\n.\\.agents\\skills\\review-work\\LICENSE\n.\\.agents\\skills\\decision-notes\\SKILL.md\n.\\.agents\\skills\\decision-notes\\LICENSE\n.\\.agents\\skills\\handoff-work\\SKILL.md\n.\\.agents\\skills\\plan-work\\SKILL.md\n.\\.agents\\skills\\handoff-work\\LICENSE\n.\\.agents\\skills\\plan-work\\LICENSE\n.\\.agents\\skills\\implement-work\\LICENSE\n.\\.agents\\skills\\implement-work\\SKILL.md\n.\\.agents\\skills\\clarify-work\\SKILL.md\n.\\.agents\\skills\\debug-work\\LICENSE\n.\\.agents\\skills\\debug-work\\SKILL.md\n.\\.agents\\skills\\clarify-work\\LICENSE\n.\\.agents\\decisions\\2026-09-01-accepted-json-storage.md\n.\\.agents\\skills\\implement-work\\references\\ts-python.md\n.\\.agents\\skills\\clarify-work\\references\\project-interview.md\n.\\.agents\\skills\\codebase-design\\DESIGN-IT-TWICE.md\n.\\.agents\\skills\\codebase-design\\DEEPENING.md\n.\\.agents\\skills\\codebase-design\\LICENSE\n.\\.agents\\skills\\codebase-design\\SKILL.md\n.\\.agents\\skills\\codebase-design\\agents\\openai.yaml\n"
+}
+
+COMMAND:
+Get-Content -LiteralPath 'AGENTS.md' -Raw
+Get-Content -LiteralPath '.agents/skills/decision-notes/SKILL.md' -Raw
+Get-Content -LiteralPath '.agents/decisions/2026-09-01-accepted-json-storage.md' -Raw
+Get-Content -LiteralPath 'store.py' -Raw
+Get-Content -LiteralPath 'test_store.py' -Raw
+Get-Content -LiteralPath '.gitignore' -Raw
+RESULT:
+{
+  "chunk_id": "9d350c",
+  "wall_time_seconds": 0.1489038,
+  "exit_code": 0,
+  "original_token_count": 3434,
+  "output": "# Project notes\r\n\r\nUse the existing Python standard library where applicable. Run Python checks with `python -m unittest discover -v`. For HTML text-only edits, inspect the exact change. Preserve work outside the user request.\r\n\r\n---\nname: decision-notes\ndescription: \"维护 .agents/decisions/ 下的决策笔记:保存代码与测试无法表达的「为什么」——设计意图、不可破坏的边界、被否决的方案,供后续会话检索。做重要技术选型、改动架构边界/跨模块契约/持久化格式时写或更新笔记;修改已有代码前,或讨论「这个方案是否被否决过」时先检索约束;看到代码里的 `Decision:` 注释或 `.agents/decisions/` 目录也应使用。纯格式化、拼写、局部 bugfix 等机械改动不新建笔记。\"\n---\n\n# Decision Notes\n\n决策笔记保存**代码和测试无法可靠推导出的「为什么」**：设计意图、不能破坏的边界、被否决的方案。每个新会话都没有记忆，只能看到眼前的代码：一段写得别扭的代码，往往是为了避免死锁或兼容某个约束而故意为之，不知情的 Agent 会把它「优化」掉；三个月前被否决的方案，也会被一次次重新提出。笔记就是留给下一个会话的护栏。\n\n它不是工作日志：不记录今天做了什么、思考过程、TODO 或进度，这些属于 PR 描述。\n\n笔记放在扁平目录 `.agents/decisions/`。目录不存在表示暂无笔记，首次需要记录时创建。自动校验是可选的项目工具，不要求特定语言或包管理器，何时调用见第 7 节；校验只管结构与引用，内容由你负责。\n\n## 1. Search Before Modifying Existing Code\n\n无论任务大小都做，因为最容易误改的恰恰是「看起来只是小重构」的任务。目录不存在即可结束检索，否则：\n\n1. 先读 `Applies-To: project-wide` 的笔记。\n2. 把各笔记 `Applies-To` 里的仓库相对路径或 glob 与这次要改的文件逐一匹配。`rg` / `grep -ril` 能帮你找字段和字面路径，但不能替你解释 glob——不要把一次文本搜索宣称为完成了 glob 匹配。\n3. 要改的文件里有 `Decision: <文件名>.md` 注释的，读它指向的笔记；再按路径片段和领域关键词补充搜索。\n4. 命中后先读 `Status`、`Applies-To`、`Decision` 三处，确认相关再读全文。\n\n同一任务内可复用已核实的匹配结果；改动范围扩大、笔记或相关文件变化时重新检查受影响部分，不因切换 skill 重复读取未变化的全文。已有路径匹配工具时优先用其结果并核对语义；没有时仍按上述步骤检查，不为一次任务新建索引。\n\n查到之后：\n\n- **accepted**：当作当前约束遵守。这次改动若会违反它，先判断用户是否已授权这项技术选择或迁移：已授权就继续实施，新方案在实际生效范围内转为 accepted 后才取代旧笔记；只有冲突超出授权范围，或仍有必须由用户决定的取舍时，才停下来说明并询问。不要悄悄绕过或改掉原结论。\n- **rejected**：不要重新提出。只有前提确实变了才可以重提，并在新笔记里写明哪些前提变了。\n- **superseded**：只当历史看，顺着 `Superseded-By` 找到现行的那篇。\n- **proposed**：尚未定案或尚未生效，不要当作当前实现约束。它可以是已授权、正在实施的目标；是否可继续工作依据已有授权，不依据这个状态词重新请求批准。\n\n## 2. When a Note Is Needed\n\n判断标准：未来的 Agent 看到这段代码或这个契约，会不会想去简化它、绕开它，或重新提出一个已否决的方案？会就写；只看代码和测试就能理解原因，就不写。\n\n通常需要写的改动：架构边界（模块依赖、进程通信、分层）、跨模块契约（API、事件、协议、schema）、持久化契约（数据库 schema、配置与文件格式、wire protocol）、重要技术选型（SQLite 还是 JSON、IPC 还是 HTTP）、非显然约束（为什么这里不能并发、为什么故意不用缓存）。\n\n通常直接改代码、不新建笔记：格式化、拼写、简单重命名、普通 CRUD、局部 bugfix、补测试、依赖 patch 升级、纯机械重构。若这些改动改变了已有笔记中的名称、路径或行为事实，仍按第 3 节更新原笔记。\n\n拿不准时倾向不写。笔记太多没人读，比少写一篇代价更大。\n\n## 3. Update or Create\n\n结合第 1 节的检索结果，只有三种情况：\n\n- **已有笔记描述的就是这个决策**：就地更新，不新建；非核心的命名、路径或实现细节变了，直接改原笔记里的事实。\n- **相关，但这是一个新的独立决策**：新建，并在正文里用相对链接引用旧笔记。\n- **没有相关笔记**：新建。\n\n判断「同一个决策还是新决策」的依据：`Decision` 一节的**核心结论**变了没有。结论变了（如 IPC 换成 Message Bus）就新建，生效后取代旧的；没变只是细节变了就原地更新。\n\n取代旧决策时，旧笔记保留原文不删，只做两处修改：`Status: superseded`，加一行 `Superseded-By: ./新文件名.md`——「曾经为什么那样设计」仍有价值。只是部分取代时不要标 superseded：改窄旧笔记的 `Applies-To` 和 `Decision` 范围，并让新旧笔记互链。\n\n分阶段迁移时，尚未生效的新方案保持 proposed，旧约束继续描述实际现状。已有部分生效时，仅把该部分写成 accepted 并明确适用范围，未实施目标留在计划或独立 proposed 笔记中；不能让相互冲突的 accepted 结论覆盖同一范围。决策生效指其声明的范围已实际遵循该选择：代码行为以当前代码为准，纯政策约束可在正式采用时生效；涉及部署状态的声明需有部署证据，本地实现不等于生产已迁移。\n\n`rejected` 和 `superseded` 是两条不同的轨道：`superseded` 表示方案**曾经生效**、现已被取代，取代链的终点必须落在 accepted 笔记上（D103）；`rejected` 表示讨论过但**从未生效**，不能出现在取代链里——候选方案被否决时，旧笔记保持 accepted 不动，把被否决的那篇写成 rejected。已落地方案的回退也是 superseded 而不是 rejected：新建 accepted 笔记说明回退后的现行方案，并作为被回退那篇的 `Superseded-By`。\n\n笔记原则上不删除，决策失效用取代或改窄 `Applies-To` 表达。只有决策对象整体消失（功能下线、模块删除）且保留只会误导检索时才删；删除前确认没有代码里的 `Decision:` 指针和 `Superseded-By` 指向它（否则 D110 / D101 报错）。原文仍在 git 历史里。\n\n## 4. Note Format\n\n文件名 `YYYY-MM-DD-<status>-short-topic.md`。日期是首次创建日，查实际日期，不要凭印象；状态词取 `proposed` / `accepted` / `rejected` / `superseded` 之一，必须与头部 `Status` 完全一致（D022）——目录列表因此能直接读出每篇笔记的生命周期，两者不一致时以修正文件名为准；主题用小写英文 kebab-case，描述决策主题而不是任务本身。\n\n**状态变化就是一次重命名**：改完文件名，必须修掉所有指向旧文件名的地方——`Superseded-By`、正文相对链接、代码里的 `Decision:` 反向指针；漏改由 D090 / D101 / D110 报出。\n\n```markdown\n# Decision: <标题>\n\nStatus: accepted\nApplies-To: src/worker/**, src/ipc/protocol.ts\n\n## Context\n\n为什么需要做这个决定：问题、约束、触发条件。\n\n## Decision\n\n现行方案是什么，边界在哪。\n\n## Alternatives\n\n- **方案 A** — 为什么看起来合理（对手最强的论据）；为什么最终没有采用。\n- **不做 / 复用现有方案** — 为什么不够。\n\n## Consequences\n\n- Positive: 具体收益。\n- Negative: 具体代价、上限，以及什么情况下应该重新评估。\n```\n\n头部字段：\n\n- `Status`：必填，取值同上。\n- `Applies-To`：除 superseded 外必填。逗号分隔的路径或 glob（相对仓库根），全局约束写 `project-wide`。它是别的 Agent 按路径找到这篇笔记的主要入口，写宽了没用、写错了会失效，改文件名或移目录时一并更新。`rejected` 也要写：填该方案若被重新提出会落在哪些路径，仓库级选型写 `project-wide`，不要为凑字段编造不存在的路径。\n- `Superseded-By`：只在 superseded 时出现，值是同目录下的文件名。\n\n四个二级标题 `Context`、`Decision`、`Alternatives`、`Consequences` 固定，顺序固定，不加别的二级标题。\n\n各状态的含义：\n\n- **proposed**：方案已形成，尚未定案或生效；已授权但尚未实施的目标也使用此状态。只有所需取舍未获授权、存在未解决的分歧或必须由用户决定时才询问，待实施不等于待审批。\n- **accepted**：在笔记声明范围内已经实际生效的决策。用户已明确拍板、授权相关技术选择或委托选型时继续实施；生效时直接写 accepted，不必补走审批。一个任务内已完成的选择无需为形式先创建 proposed。\n- **rejected**：明确讨论过并否决，且未来仍有参考价值。`Decision` 写被否决的方案，`Alternatives` 写最后采用了什么（通常是维持现状），`Consequences` 写不做的代价。\n- **superseded**：曾经有效，已被新决策完全取代。\n\n## 5. Writing Rules\n\n**accepted 用现在时陈述事实**：写「Worker 通过 Message Bus 通信」，不写「将会」「计划」「应该」。读者是半年后只看当前代码的人，笔记跟着代码走。\n\n**不写过程叙事**：「经讨论」「本次修改了」「后续 PR 将」「用户要求」都不要出现，这些是会话残留。\n\n**Alternatives 只写真正考虑过的方案**，不要为凑模板编造。每项写清它为什么在当前约束下合理、为什么没有采用；「不做 / 复用现有方案」只在确实评估过时才写。确实没有任何备选时才可以写：\n\n```markdown\n## Alternatives\n\nNone — 遵循 [某篇已有约束笔记](./2026-08-01-accepted-example.md)。\n```\n\n`None` 必须链接到一篇已有笔记，防止它成为偷懒的默认选项。\n\n**Consequences 必须同时有 Positive 和 Negative**，写成 `- Positive: ...` / `- Negative: ...`。只记真实、具体的内容；Negative 尽量具体到成本、上限或重新评估的条件，识别不出具体代价就重新检查约束和备选，不要编一个来填模板。\n\n篇幅通常 20–60 行，超过 100 行多半是把过程写进去了。\n\n## 6. Back-Pointers in Code\n\n只在「读代码的人会觉得别扭、想简化，但其实是有意为之」的入口处，用项目语言的注释语法加一行：\n\n```ts\n// Decision: 2026-09-21-accepted-worker-runtime-boundary.md — Worker 不直接依赖 Main Process\n```\n\n一处入口一行就够，不要到处撒。\n\n## 7. Wrap-Up Checklist\n\n1. 这次改动有没有改变某篇 accepted 笔记里的事实（名称、路径、行为）？按第 3 节判断：非核心事实变化就更新原笔记，核心结论变化就新建并取代。\n2. 新笔记的 `Status`、`Applies-To`、链接是否正确，`Applies-To` 是否覆盖了实际生效范围？本次创建的 `proposed` 生效后改 accepted，被否决改 rejected；已授权但未完成或用户明确暂缓则保持，说明剩余工作，不重复审批。仍需用户决定的取舍才询问。状态变化按第 4 节重命名并修引用。\n3. 笔记和对应代码保持在同一组待交付变更中，执行提交时一起提交；此要求本身不授权 git commit。只改代码不改笔记，是笔记腐烂最常见的方式。\n4. 本次改动涉及笔记、`Decision:` 指针或笔记关联的文件路径时，运行项目已接入的结构校验——先查项目协作说明与工具配置，若采用 `npm run verify-decisions`，在项目根目录运行并读取输出。校验只管结构与引用，通过不代表设计理由正确，也不替代第 1 节的检索；失败时修正实际问题，不要为通过校验填充内容。未接入校验器时人工检查并如实说明；除非任务包含接入工具，不要擅自新增 npm 脚本、依赖或构建步骤。\n5. 最终回复里用一句话说明新建或更新了哪些笔记，没涉及就不用提。\n\r\n# Decision: JSON storage\n\nStatus: accepted\nApplies-To: store.py\n\n## Context\n\nThe application stores one small dictionary on a local machine.\n\n## Decision\n\nThe save/load functions persist the dictionary as a JSON file.\n\n## Alternatives\n\n- SQLite: transactions are useful, but the current single-writer usage does not require them.\n\n## Consequences\n\n- Positive: the data is readable without a database viewer.\n- Negative: whole-file writes cannot support concurrent transactions.\n\r\nimport json\nfrom pathlib import Path\n\n# Decision: 2026-09-01-accepted-json-storage.md - Local storage format\ndef save(path, values):\n    Path(path).write_text(json.dumps(values), encoding=\"utf-8\")\n\n\ndef load(path):\n    return json.loads(Path(path).read_text(encoding=\"utf-8\"))\n\r\nfrom pathlib import Path\nimport tempfile\nimport unittest\nfrom store import load, save\n\n\nclass StoreTests(unittest.TestCase):\n    def test_roundtrip(self):\n        with tempfile.TemporaryDirectory() as directory:\n            path = Path(directory) / \"records.data\"\n            values = {\"name\": \"bread\", \"quantity\": 2}\n            save(path, values)\n            self.assertEqual(load(path), values)\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n\r\n__pycache__/\r\n*.pyc\r\n\r\n"
+}
+
+COMMAND:
+Get-Date -Format 'yyyy-MM-dd'
+Get-ChildItem -Force | Select-Object Name,Mode
+rg -n --hidden '^(Status:|Applies-To:|Superseded-By:)|Decision:|verify-decisions|pytest|unittest|sqlite|JSON|json' AGENTS.md store.py test_store.py .agents/decisions
+Get-FileHash -Algorithm SHA256 -LiteralPath 'store.py','test_store.py','.agents/decisions/2026-09-01-accepted-json-storage.md'
+python -m unittest discover -v
+RESULT:
+{
+  "chunk_id": "750717",
+  "wall_time_seconds": 0.3220254,
+  "exit_code": 0,
+  "original_token_count": 336,
+  "output": "2026-09-29\r\n\r\ntest_store.py:3:import unittest\ntest_store.py:7:class StoreTests(unittest.TestCase):\ntest_store.py:17:    unittest.main()\nstore.py:1:import json\nstore.py:4:# Decision: 2026-09-01-accepted-json-storage.md - Local storage format\nstore.py:6:    Path(path).write_text(json.dumps(values), encoding=\"utf-8\")\nstore.py:10:    return json.loads(Path(path).read_text(encoding=\"utf-8\"))\nAGENTS.md:3:Use the existing Python standard library where applicable. Run Python checks with `python -m unittest discover -v`. For HTML text-only edits, inspect the exact change. Preserve work outside the user request.\r\n.agents/decisions\\2026-09-01-accepted-json-storage.md:1:# Decision: JSON storage\n.agents/decisions\\2026-09-01-accepted-json-storage.md:3:Status: accepted\n.agents/decisions\\2026-09-01-accepted-json-storage.md:4:Applies-To: store.py\n.agents/decisions\\2026-09-01-accepted-json-storage.md:12:The save/load functions persist the dictionary as a JSON file.\ntest_roundtrip (test_store.StoreTests.test_roundtrip) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 1 test in 0.005s\r\n\r\nOK\r\nName          Mode\r\n----          ----\r\n.agents       d----\r\n.git          d--h-\r\n.gitignore    -a---\r\nAGENTS.md     -a---\r\nstore.py      -a---\r\ntest_store.py -a---\r\n              \r\n              \r\n              \r\n\r\n"
+}
+
+COMMAND:
+Get-FileHash -Algorithm SHA256 -LiteralPath 'store.py','test_store.py','.agents/decisions/2026-09-01-accepted-json-storage.md' | Select-Object Path,Hash | ConvertTo-Json
+RESULT:
+{
+  "chunk_id": "293356",
+  "wall_time_seconds": 0.1873542,
+  "exit_code": 0,
+  "original_token_count": 185,
+  "output": "[\r\n  {\r\n    \"Path\": \"C:\\\\TEMP\\\\engineering-skills-migration-planning-explicit-full-r_7vpgtd\\\\project\\\\store.py\",\r\n    \"Hash\": \"165782ACB103B3C09368CD5FA573E0D1DAE31B7AD54A83E8F1F17F03D643E0C0\"\r\n  },\r\n  {\r\n    \"Path\": \"C:\\\\TEMP\\\\engineering-skills-migration-planning-explicit-full-r_7vpgtd\\\\project\\\\test_store.py\",\r\n    \"Hash\": \"6DBC2579AA369BBC36F46960E8885140B2A0B41260E515DC5EF874252D3DBE34\"\r\n  },\r\n  {\r\n    \"Path\": \"C:\\\\TEMP\\\\engineering-skills-migration-planning-explicit-full-r_7vpgtd\\\\project\\\\.agents\\\\decisions\\\\2026-09-01-accepted-json-storage.md\",\r\n    \"Hash\": \"FB631FD3D5E991220340F7BECEAE5DDDE9EBBE71E2C705A151F284A2EFF37005\"\r\n  }\r\n]\r\n"
+}
+
+COMMAND:
+tools.apply_patch
+*** Begin Patch
+*** Add File: C:\TEMP\engineering-skills-migration-planning-explicit-full-r_7vpgtd\project\.agents\decisions\2026-09-29-proposed-sqlite-storage.md
++# Decision: SQLite dictionary snapshot storage
++
++Status: proposed
++Applies-To: store.py, test_store.py
++
++## Context
++
++存储对象是本地的小型字典，公开入口只有 `save(path, values)` 与 `load(path)`，没有按键查询或部分更新接口。
++当前实现仍遵循 [JSON 存储决策](./2026-09-01-accepted-json-storage.md)。SQLite 是已确定且获授权的目标；此状态表示尚未实施，不表示等待审批。
++存量 JSON 无需迁移。保持字典的公开读写行为比引入通用数据库抽象更重要。
++
++## Decision
++
++目标使用 Python 标准库 `sqlite3`，每个调用方指定的路径对应一个数据库文件，无新增依赖。
++采用单行快照表，完整字典仍经 `json.dumps` / `json.loads` 编解码，以保留现有 JSON 可表示值、嵌套结构和键转换语义。
++
++```sql
++CREATE TABLE IF NOT EXISTS store_snapshot (
++    id INTEGER PRIMARY KEY CHECK (id = 1),
++    payload TEXT NOT NULL
++);
++```
++
++`save` 在打开数据库前完成序列化，在同一事务内建表并以参数绑定写入或替换 `id = 1` 的快照，成功提交后返回 `None`；失败回滚，连接在所有路径上关闭。
++`load` 只读打开已有数据库并读取该行，不创建文件、表或默认字典。缺失路径保留 `FileNotFoundError`；有效数据库中缺失快照行报 `ValueError`；数据库格式或表结构错误向外报告 `sqlite3.DatabaseError`（含其子类）。非法快照 JSON 的解码错误保持可见。
++不建立逐键行、不拆分嵌套类型、不引入 ORM 或 SQLite JSON 扩展。新库在首次保存时建立；现存 JSON 不自动导入或回退读取，也不自动删除、截断或覆盖为数据库。
++每次保存替换整个快照，不合并旧键；并发写入遵循 SQLite 事务与锁规则，不承诺应用层冲突合并。
++
++## Alternatives
++
++- **每个字典键一行**：便于按键检索和更新，但当前没有这类公开接口，且需要额外定义嵌套值、键转换及整字典替换语义，因此不采用。
++- **保留 JSON 文件**：实现简单、内容可直接阅读，但不满足 SQLite 目标，也没有数据库事务带来的原子提交边界，因此不作为目标方案。
++
++## Consequences
++
++- Positive: 利用标准库事务原子替换整个字典，保留现有 JSON 值语义，调用者无需更改函数签名或文件扩展名。
++- Negative: 仍需整体序列化、整体读写，不能直接按键查询；数据需数据库工具查看，锁竞争和格式错误会以 SQLite 异常暴露。需要按键更新或冲突合并时应重新评估表结构。
+*** Add File: C:\TEMP\engineering-skills-migration-planning-explicit-full-r_7vpgtd\project\.agents\work\sqlite-storage\plan.md
++# SQLite 存储实施计划
++
++本轮状态：规划完成，尚未实施。SQLite 迁移与表结构选型已获授权，无需再次审批。
++
++## 目标与范围
++
++本文件是聊天需求的唯一需求级维护来源：把 `store.py` 的 JSON 文件存储换为 SQLite，保留 `save(path, values)` / `load(path)` 面向字典的公开行为；旧 JSON 无需迁移。本轮只保存计划与目标决策，实施留待之后。
++
++需求级验收：
++
++- 原有 `Path` 及字符串路径继续可用，路径由调用者提供，不强制改扩展名；`save` 成功返回 `None`，`load` 返回已保存字典。
++- 空字典、嵌套字典/列表、字符串、数字、布尔值与空值延续现有 JSON 编解码语义；不扩大为任意 Python 对象序列化。
++- 重复保存完整替换原字典，被移除的键不会残留；成功返回后关闭并重新读取仍可获得已提交快照。
++- 保存失败不能损坏上一份已提交快照；读取不存在路径不能创建文件；存量 JSON 不导入、不隐式回退、不破坏原文件。
++- 仅使用标准库。不扩展按键查询、数据迁移工具、ORM、UI、应用层并发合并或部署流程。
++
++## 已核实的现状与约束
++
++- [`store.py`](../../../store.py) 用 `Path.write_text(json.dumps(...))` 和 `json.loads(Path.read_text(...))` 实现整体读写，代码有当前决策反向指针。
++- [`test_store.py`](../../../test_store.py) 使用 `unittest` 与临时目录，现有唯一测试是 `{"name": "bread", "quantity": 2}` 的往返。
++- [`AGENTS.md`](../../../AGENTS.md) 要求优先标准库，检查入口为 `python -m unittest discover -v`。项目未接入决策结构校验器，当前没有额外工具配置。
++- [当前 JSON 决策](../../decisions/2026-09-01-accepted-json-storage.md) 的 `Applies-To: store.py` 精确覆盖当前实现；本轮保持 `accepted` 和原文不变。
++- [目标 SQLite 决策](../../decisions/2026-09-29-proposed-sqlite-storage.md) 是尚未实施的 `proposed`；表结构、事务、读取失败行为与取舍理由只在该笔记维护。
++
++## 实施切片
++
++### 1. 字典保存、读取和整体替换（建议先做）
++
++依赖：无；实施前复核上述代码、约束与计划是否变化。状态：待开始。
++
++交付：在 `store.py` 内完成目标决策所述 SQLite 写入和只读读取路径，保持函数签名与 JSON 值语义；在 `test_store.py` 扩展真实临时数据库测试。不增加与本任务无关的抽象层。
++
++验收与验证：
++
++- 现有往返测试继续通过；补充空字典、Unicode、嵌套值、布尔值、空值、字符串路径和 `Path` 路径，以及成功保存返回 `None` 的断言。
++- 先保存较大字典，再保存去掉键的字典，读取结果恰好等于第二个字典；再保存 `{}`，确认无旧键残留。
++- 使用独立 `sqlite3` 连接读取实际数据库，确认快照存在且只有一行；关闭后再调用 `load`，验证文件确实是持久化的 SQLite 数据库。
++- 增加与现有 JSON 一致的行为示例，如整数键在往返后成为字符串，避免无意增加更严格的类型校验。
++- 计划运行 `python -m unittest discover -v`，检查全套测试均通过。
++
++集成边界：该片作为完整可用的 SQLite 读写变更交付时，同步将目标笔记重命名为 `2026-09-29-accepted-sqlite-storage.md` 并改为 `Status: accepted`；将原笔记重命名为 `2026-09-01-superseded-json-storage.md`，只改状态并加指向新 accepted 笔记的 `Superseded-By`，保留历史正文。修正代码 `Decision:` 指针、计划与笔记链接，并把目标笔记陈述改为现行事实。若实现未完成或仍未集成验证，不提前切换状态；不能让取代链指向 proposed。
++
++### 2. 失败路径与事务边界
++
++依赖：切片 1 已完成；复用同一存储入口与测试文件，顺序实施。状态：待开始。
++
++交付：围绕真实文件和数据库补充异常路径验证；根据失败结果修复资源关闭、回滚或错误传播。
++
++验收与验证：
++
++- 在已有有效快照后保存含不可 JSON 序列化值的字典，断言 `TypeError` 且旧快照不变；对新路径执行同样操作，确认不会留下数据库文件。
++- 在临时数据库上用 SQLite 触发器拒绝下一次写入，触发真实 SQL 失败；断言失败向外传播、重新连接仍读到旧快照。移除触发器后保存应成功，证明连接与锁已释放。
++- `load` 不存在路径时抛 `FileNotFoundError` 且不创建文件；表已存在但无快照时抛 `ValueError`，不默默返回 `{}`。
++- 缺少目标表、损坏文件、存量 JSON 的读取，以及向存量 JSON 保存，均明确失败；操作前后比对存量 JSON 字节，确认未覆盖。非法快照 JSON 的解码错误应可见。
++- 计划运行 `python -m unittest discover -v`；检查错误发生后数据库可再次打开、正常保存和读取，不依靠 timing 或只验证 mock 调用次数。
++
++集成检查：人工复核所有决策头部、文件名状态、相对链接、代码反向指针和取代链；确认对应代码范围内只有一个现行 accepted 结论。未来若项目接入决策校验器，再使用其正式入口。
++
++## 本轮实际检查
++
++- 2026-09-29 已运行 `python -m unittest discover -v`：现有 1 条 JSON 往返测试通过。这只是实施前基线，不证明 SQLite 已完成。
++- 已检索当前决策的 `Status`、`Applies-To` 和代码反向指针；不存在全局决策或其他相关笔记。
++- 本轮仅新增本计划与目标决策，人工复核结构和相对链接；`store.py`、`test_store.py`、原 JSON 决策以 SHA-256 比对确认未改动。
++- 上述 SQLite 专项测试均为计划运行，本轮未新增或执行这些测试。
++
++## 开放问题
++
++无阻塞取舍。目标决策已给出适合现有小字典整体读写接口的表结构；没有证据支持增加查询接口或应用层并发合并。开始实施时若发现需求变化，应先同步本计划的需求级条目及受影响切片。
+*** End Patch
+RESULT:
+{}
+
+COMMAND:
+@'
+from pathlib import Path
+import hashlib
+import re
+expected = {
+    'store.py': '165782ACB103B3C09368CD5FA573E0D1DAE31B7AD54A83E8F1F17F03D643E0C0',
+    'test_store.py': '6DBC2579AA369BBC36F46960E8885140B2A0B41260E515DC5EF874252D3DBE34',
+    '.agents/decisions/2026-09-01-accepted-json-storage.md': 'FB631FD3D5E991220340F7BECEAE5DDDE9EBBE71E2C705A151F284A2EFF37005',
+}
+for name, digest in expected.items():
+    actual = hashlib.sha256(Path(name).read_bytes()).hexdigest().upper()
+    assert actual == digest, name
+    print('UNCHANGED', name, actual)
+note = Path('.agents/decisions/2026-09-29-proposed-sqlite-storage.md')
+plan = Path('.agents/work/sqlite-storage/plan.md')
+content = note.read_text(encoding='utf-8')
+assert 'Status: proposed' in content
+assert 'Applies-To: store.py, test_store.py' in content
+assert re.findall(r'^## (.+)$', content, re.M) == ['Context', 'Decision', 'Alternatives', 'Consequences']
+assert '- Positive:' in content and '- Negative:' in content
+assert 'Superseded-By:' not in content
+for file in (note, plan):
+    for target in re.findall(r'\]\(([^)]+)\)', file.read_text(encoding='utf-8')):
+        assert (file.parent / target).resolve().is_file(), (file, target)
+        print('LINK OK', str(file), target)
+print('DOCUMENT STRUCTURE AND LINKS OK')
+'@ | python -
+git diff --check
+git status --short
+RESULT:
+{
+  "chunk_id": "095847",
+  "wall_time_seconds": 0.2563589,
+  "exit_code": 0,
+  "original_token_count": 227,
+  "output": "UNCHANGED store.py 165782ACB103B3C09368CD5FA573E0D1DAE31B7AD54A83E8F1F17F03D643E0C0\r\nUNCHANGED test_store.py 6DBC2579AA369BBC36F46960E8885140B2A0B41260E515DC5EF874252D3DBE34\r\nUNCHANGED .agents/decisions/2026-09-01-accepted-json-storage.md FB631FD3D5E991220340F7BECEAE5DDDE9EBBE71E2C705A151F284A2EFF37005\r\nLINK OK .agents\\decisions\\2026-09-29-proposed-sqlite-storage.md ./2026-09-01-accepted-json-storage.md\r\nLINK OK .agents\\work\\sqlite-storage\\plan.md ../../../store.py\r\nLINK OK .agents\\work\\sqlite-storage\\plan.md ../../../test_store.py\r\nLINK OK .agents\\work\\sqlite-storage\\plan.md ../../../AGENTS.md\r\nLINK OK .agents\\work\\sqlite-storage\\plan.md ../../decisions/2026-09-01-accepted-json-storage.md\r\nLINK OK .agents\\work\\sqlite-storage\\plan.md ../../decisions/2026-09-29-proposed-sqlite-storage.md\r\nDOCUMENT STRUCTURE AND LINKS OK\r\n?? .agents/decisions/2026-09-29-proposed-sqlite-storage.md\n?? .agents/work/\n"
+}
+
+
+# Parent artifact audit
+{
+  "changed_or_removed": [],
+  "added": [
+    ".agents/decisions/2026-09-29-proposed-sqlite-storage.md",
+    ".agents/work/sqlite-storage/plan.md"
+  ],
+  "skills_unchanged": true,
+  "head_unchanged": true
+}
+
+# Parent outcome verification
+null
