@@ -21,8 +21,8 @@ Actions 依赖经官方仓库核对后固定完整 commit SHA，参照 [GitHub �
 - 对暂存文件做常见 GitHub / API 凭据、私钥头和已知本机身份字符串的模式扫描，未发现匹配。该扫描不是对任意敏感内容的完整证明。
 - `git diff --cached --check` 通过，测试 fixture 未被误忽略。
 
-本地检查环境为 Windows、Python 3.12.8。CI 配置语法及关键字段已检查；GitHub 托管运行、Linux 和 Python 3.10 的实际结果须在上传后取得，不能将配置存在计为通过。
+本地检查环境为 Windows、Python 3.12.8。首次上传后，[GitHub Actions 托管运行](https://github.com/Celestia-Milara/engineering-skills/actions/runs/36654445317) 的 Windows / Ubuntu、Python 3.10 / 3.12 四组任务全部通过。
 
 ## 首次上传
 
-仓库创建为私有的 [Celestia-Milara/engineering-skills](https://github.com/Celestia-Milara/engineering-skills)，上传 `main` 分支。首次托管 CI 的结果应在 GitHub 上核对；真实项目试用反馈和版本标签留待后续决定。本记录中的本地检查不代替托管 CI 结果。
+仓库最初以私有形式创建并上传 `main` 分支。公开前复核了全部提交的文件内容与作者邮箱，以及 Actions 日志、发布物和产物；未发现凭据或本机身份信息。2026-09-30 将 [Celestia-Milara/engineering-skills](https://github.com/Celestia-Milara/engineering-skills) 设为 public，并通过匿名请求验证可访问。真实项目试用反馈和版本标签留待后续决定。
