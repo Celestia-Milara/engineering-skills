@@ -253,8 +253,8 @@ def validate(root: Path, selected: set[str] | None = None,
             error("manifest.duplicate", context, destination)
         destinations.add(destination)
         treatment = entry.get("treatment")
-        if treatment not in {"verbatim", "translated", "adapted"}:
-            error("manifest.treatment", context, "Expected verbatim, translated, or adapted")
+        if treatment not in {"verbatim", "translated", "adapted", "original"}:
+            error("manifest.treatment", context, "Expected verbatim, translated, adapted, or original")
         expected = entry.get("distributed_sha256", "")
         if not isinstance(expected, str) or not SHA256.fullmatch(expected):
             error("manifest.hash", context, "Invalid distributed_sha256")
@@ -267,6 +267,10 @@ def validate(root: Path, selected: set[str] | None = None,
             data = None
             error("manifest.destination", destination, str(exc))
         references = entry.get("source_files")
+        if treatment == "original":
+            if references != []:
+                error("manifest.original", context, "Original files require an empty source_files array; do not invent upstream provenance")
+            continue
         if not isinstance(references, list) or not references:
             error("manifest.source_files", context, "Expected a nonempty source_files array")
             continue
@@ -306,9 +310,13 @@ def validate(root: Path, selected: set[str] | None = None,
     for name in sorted(selected):
         source = sections["skill_sources"].get(name)
         archive = sections["licenses"].get(source) if isinstance(source, str) else None
-        if not isinstance(source, str) or source not in sources or archive is None:
+        if not isinstance(source, str) or (source != "original" and source not in sources) or archive is None:
             error("license.source", name, "Missing source/license mapping")
             continue
+        entrypoint = next((entry for entry in entries if isinstance(entry, dict)
+                           and entry.get("destination") == f"skills/{name}/SKILL.md"), None)
+        if entrypoint and (entrypoint.get("treatment") == "original") != (source == "original"):
+            error("manifest.original", name, "Original skill mapping and entrypoint treatment must agree")
         archive_path = package_path(archive, f"licenses.{source}")
         if archive_path is None:
             continue

@@ -4,3 +4,5 @@
 skills/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Archived notices must stay byte-identical to the per-skill licenses.
 licenses/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Captured evidence includes Git diff context lines consisting of a single space.
+evals/results/*.evidence.txt whitespace=-blank-at-eol

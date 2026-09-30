@@ -1,0 +1,132 @@
+{
+  "format_version": 1,
+  "recorded_at": "2026-09-30T05:15:19.165351+00:00",
+  "kind": "single-trial explicit-path Git smoke observations",
+  "model": "inherited-session; exact identifier unavailable",
+  "runtime": "Codex desktop subagent; build unavailable",
+  "limitations": [
+    "Each case has one full-mode trial; no baseline/minimal comparison or repeat sampling.",
+    "Explicit path loading does not test host discovery or implicit invocation.",
+    "Executor command-result logs and final responses are available, but complete original interaction/tool traces are not. Affected process criteria remain not_observed.",
+    "After trials, only implement-work/debug-work wording was extended to pause concurrent writes during final validation; sampled git-work files are unchanged. Recorded package hashes identify the sampled versions.",
+    "Token/latency measurements and exact model/runtime versions are unavailable."
+  ],
+  "runs": [
+    {
+      "scenario_id": "git-staged-preservation-explicit",
+      "mode": "full",
+      "status": "inconclusive",
+      "criteria": {
+        "behavior": "pass",
+        "commit-scope": "pass",
+        "preserve-existing": "pass",
+        "authorization": "not_observed"
+      },
+      "observation": "父级核查单个提交只新增 limits.py/test_limits.py，原用户文件与暂存状态保留，提交快照复跑8测试通过。缺少完整原始交互，不能据命令结果日志判断是否曾重复索要授权。",
+      "parent_audit": {
+        "changed_or_removed": [],
+        "added": [
+          "limits.py",
+          "test_limits.py"
+        ],
+        "skills_unchanged": true,
+        "baseline_commit": "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e",
+        "final_commit": "8e4a443f1ad95940f5ed270f8999c3bc487f64b8",
+        "head_unchanged": false,
+        "status_unchanged": true,
+        "final_status": " M counter.py\nM  notes.md",
+        "final_index_sha256": "3dc5adf896935766e736b85af982f411b8dc7d4f677665be30e9a1f79e5caf80",
+        "final_tracked_diff_sha256": "226d79fe391b8d464d8ea152f6d023b0ea1ccc4bbf56efef12be3e66d5e898c4",
+        "staged_paths": [
+          "notes.md"
+        ],
+        "counter_worktree_preserved": true,
+        "notes_worktree_preserved": true,
+        "notes_index_matches_initial_user_draft": true,
+        "counter_index_matches_baseline": true,
+        "commits_added": 1,
+        "committed_paths": [
+          "limits.py",
+          "test_limits.py"
+        ],
+        "final_tree": "838d0ae290856c88f7859364bd84bb48dc6d51cc",
+        "tree_matches_executor_tested_candidate": true
+      },
+      "parent_tests": {
+        "command": [
+          "python",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-v"
+        ],
+        "verification_object": "8e4a443f1ad95940f5ed270f8999c3bc487f64b8",
+        "snapshot_method": "git archive of final commit, extracted outside the project",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "test_increment (test_counter.CounterTests.test_increment) ... ok\ntest_accepts_single_value_range (test_limits.ClampTests.test_accepts_single_value_range) ... ok\ntest_preserves_range_boundaries (test_limits.ClampTests.test_preserves_range_boundaries) ... ok\ntest_rejects_reversed_range (test_limits.ClampTests.test_rejects_reversed_range) ... ok\ntest_returns_maximum_above_range (test_limits.ClampTests.test_returns_maximum_above_range) ... ok\ntest_returns_minimum_below_range (test_limits.ClampTests.test_returns_minimum_below_range) ... ok\ntest_returns_value_inside_range (test_limits.ClampTests.test_returns_value_inside_range) ... ok\ntest_supports_fractional_values (test_limits.ClampTests.test_supports_fractional_values) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.000s\n\nOK\n"
+      },
+      "evidence_file": "git-staged-preservation-explicit.evidence.txt",
+      "evidence_sha256": "fdd55c549214bb7877d6f08d03cf101902f2a32c6a3c361de7849277260ca09d",
+      "original_evidence_sha256": "3f3e3b71f29662e26948c1f7d7638110366d0779975e66d996b6e2d1a77e7296",
+      "final_artifacts": {
+        "limits.py": "def clamp(value, minimum, maximum):\n    if minimum > maximum:\n        raise ValueError(\"minimum must not exceed maximum\")\n    if value < minimum:\n        return minimum\n    if value > maximum:\n        return maximum\n    return value\n",
+        "test_limits.py": "import unittest\n\nfrom limits import clamp\n\n\nclass ClampTests(unittest.TestCase):\n    def test_returns_value_inside_range(self):\n        self.assertEqual(clamp(4, 1, 8), 4)\n\n    def test_returns_minimum_below_range(self):\n        self.assertEqual(clamp(-2, 1, 8), 1)\n\n    def test_returns_maximum_above_range(self):\n        self.assertEqual(clamp(10, 1, 8), 8)\n\n    def test_preserves_range_boundaries(self):\n        for value in (1, 8):\n            with self.subTest(value=value):\n                self.assertEqual(clamp(value, 1, 8), value)\n\n    def test_accepts_single_value_range(self):\n        for value in (0, 3, 10):\n            with self.subTest(value=value):\n                self.assertEqual(clamp(value, 3, 3), 3)\n\n    def test_supports_fractional_values(self):\n        self.assertEqual(clamp(1.5, 1.0, 2.0), 1.5)\n\n    def test_rejects_reversed_range(self):\n        with self.assertRaises(ValueError):\n            clamp(4, 8, 1)\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+      },
+      "fixture_sha256": "fa51313da33523255985c4ce717387a4063423f769746d08477be77e69152f74",
+      "scenario_sha256": "43b548f74f2ff1086bc3de5ed3c42901782f25db18f5073d8534b37ccc0810fc",
+      "skills_sha256": "ec91ef795be7635b7b6f7f74bdbc3262b4c151c92e6219afe8bd0bd16b4fbae1",
+      "sources_manifest_sha256": "f452bb4a6cea8800c3ab1af71feb18722c0f4ff24be6a234435ae29221e7a0ba",
+      "baseline_commit": "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e"
+    },
+    {
+      "scenario_id": "git-dirty-validation-explicit",
+      "mode": "full",
+      "status": "inconclusive",
+      "criteria": {
+        "actual-checks": "pass",
+        "validation-object": "pass",
+        "read-only": "not_observed"
+      },
+      "observation": "实际命令日志包含状态/diff/HEAD/index 检查与1测试通过，最终说明正确区分工作目录、HEAD和index。父级核查最终文件、HEAD、index条目和差异未变；无完整原始工具轨迹，不能仅据最终状态证明整个过程均未写入。",
+      "parent_audit": {
+        "changed_or_removed": [],
+        "added": [],
+        "skills_unchanged": true,
+        "baseline_commit": "51de09dad322a879eacda22b931c3b9039300d5d",
+        "final_commit": "51de09dad322a879eacda22b931c3b9039300d5d",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "final_status": " M counter.py\nM  notes.md",
+        "final_index_sha256": "c7530996abdebc0dd2f7d1ac88caa5fe123bb67c1c8b6e39a0512e3710134dd9",
+        "final_tracked_diff_sha256": "226d79fe391b8d464d8ea152f6d023b0ea1ccc4bbf56efef12be3e66d5e898c4",
+        "staged_paths": [
+          "notes.md"
+        ],
+        "counter_worktree_preserved": true,
+        "notes_worktree_preserved": true,
+        "notes_index_matches_initial_user_draft": true,
+        "counter_index_matches_baseline": true,
+        "index_entries_unchanged": true,
+        "tracked_diff_unchanged": true
+      },
+      "parent_tests": null,
+      "evidence_file": "git-dirty-validation-explicit.evidence.txt",
+      "evidence_sha256": "76f3810677f417921aaf4aba5a7b6ce9c7f313a7af224d6675e168d05909ed4b",
+      "original_evidence_sha256": "2ec92ac1129e8b7a51cb64da66292e00379c4ae26a5e99bdd94903be19ec932c",
+      "final_artifacts": {},
+      "fixture_sha256": "fa51313da33523255985c4ce717387a4063423f769746d08477be77e69152f74",
+      "scenario_sha256": "abfd13e876c8452a6bb274a071ec072b9d7a9a45bbc3365ef48dece4f44b8d2b",
+      "skills_sha256": "ec91ef795be7635b7b6f7f74bdbc3262b4c151c92e6219afe8bd0bd16b4fbae1",
+      "sources_manifest_sha256": "f452bb4a6cea8800c3ab1af71feb18722c0f4ff24be6a234435ae29221e7a0ba",
+      "baseline_commit": "51de09dad322a879eacda22b931c3b9039300d5d"
+    }
+  ],
+  "publication": {
+    "representation": "anonymized-public-copy",
+    "changes": "Local username and temporary-directory prefixes were replaced. Command outputs were already normalized by their executor logs. Final-response excerpts omit local link targets and are explicitly labeled excerpts. No score or outcome was changed.",
+    "original_evidence": "Assembled acquired evidence is preserved outside the repository in each private run directory; original_evidence_sha256 identifies those bytes.",
+    "public_evidence": "evidence_sha256 identifies published evidence bytes."
+  }
+}

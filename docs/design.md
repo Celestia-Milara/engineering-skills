@@ -46,14 +46,24 @@ clarify-work 的深入访谈保留 grill 的核心作用：Agent 主动追问，
 
 对于偏好更少技能的项目，可以暂不安装 codebase-design，实施技能也不依赖它才能运行。TDD 的上游参考示例使用 TypeScript，但入口和方法不绑定语言；对外部交互契约的必要断言，以实际行为需求为准。
 
-## 第一版暂不纳入
+## Git 规则的接入
+
+新增 [git-work](../skills/git-work/SKILL.md) 是本库原创，来源清单使用 `original` 与分发哈希，不伪造上游对应文件。它可独立安装，也不成为其他技能的必需依赖。现有执行入口保留工作区、暂存归属和共享目录单一 Git 操作者的必要边界；复杂提交、隔离、集成和恢复按需读取 git-work。普通实现仍不默认提交；项目可在协作说明中明确允许本地提交，push、合并和共享历史重写各自沿用已有授权。
+
+隔离单位是独立实现任务，不要求每个 agent 都建 worktree。共享目录按修改范围分工，由一个负责人操作 Git，在最终验证与提交窗口暂停其他写入。独立任务交付固定源版本，集成者核对目标和候选组合，验证结论绑定实际内容；任务状态或分支名不能代替版本。纯提交消息变化且内容与验证条件未变时可复用证据，不机械地要求每个 commit 全量测试。
+
+任务负责人、修改范围、基线、交付版本和检查复用已有计划、交接或 PR；decision-notes 仍只保存长期理由。借鉴编排型 AgentGit 的任务与验证思路，但不增加 `.agentgit` 任务数据库，也不采用未经版本绑定的 `approved` 合并闸门。会话工具与 Git AI 仅在确有交接或来源归因需求时评估。调研日期及所读实现限制保留在 [工具参考](../skills/git-work/references/tools.md)，不成为每次提交的必读资料。
+
+新项目使用根目录 [AGENTS.example.md](../AGENTS.example.md) 填写真实事实并提取为项目 AGENTS.md；已有项目使用 [AGENTS.snippet.md](../templates/AGENTS.snippet.md) 合并。完整模板只维护一份，底线与按需路由在两种入口保持一致，不将本库维护命令带入业务项目。
+
+## 暂不纳入的上游流程
 
 - **ask-matt / setup-matt-pocock-skills**：面向上游整套工具路由与 tracker 配置，本库用一张选择表和 AGENTS 片段即可。
 - **triage / wayfinder**：工单状态与大型探索编排超出当前轻量需求。需要时可单独评估，不为了 3–4 人团队先引入。
 - **prototype**：概念有用，但原版包含特定 HTML/UI 产物和保存分支流程。实际需要验证交互或状态模型时再接入，避免默认扩大到原型归档。
 - **research**：原版默认后台 agent。当前代码与官方资料调查由相应任务按需完成，暂不加独立研究编排。
 - **improve-codebase-architecture**：全库扫描、报告和访谈不是每次开发的前置条件。先用 codebase-design 解决明确的局部问题。
-- **resolving-merge-conflicts**：原版包括完成 merge/rebase、永不 abort 等较强操作约束；当前先按用户实际意图解决冲突，不复用整套动作。
+- **resolving-merge-conflicts**：原版包括完成 merge/rebase、永不 abort 等较强操作约束；本版 git-work 按实际意图、双方行为和可恢复状态处理冲突，不复用整套动作。
 - **wizard / setup-pre-commit 等工具配置技能**：按项目实际需要单独加入，不默认所有 TS / Python 项目需要相同工具链。
 
 ## 产物与协作

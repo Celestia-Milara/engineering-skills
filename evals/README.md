@@ -24,11 +24,13 @@ python -B -X utf8 scripts/validate.py --source-root decision-notes=../decision-n
 
 `source_files[].sha256` 对应 `git show <commit>:<path>` 的原始 blob 字节；`distributed_sha256` 对应实际分发字节。工具只报告差异，**不会更新哈希来掩盖漂移**。Windows 工作树 CRLF 不用于核对来源 blob。
 
+本库原创的 `git-work` 文件使用 `original` 处理方式和空 `source_files`；skill 来源的保留值 `original` 映射到根 MIT 许可证。验证器核对原创文件的分发哈希、来源声明与许可证，不要求虚构源 commit。可以运行 `python -B -X utf8 scripts/validate.py --skills git-work` 检查其独立安装边界；其他技能不依赖它。
+
 负向测试在临时副本中故意修改分发内容、制造断链、移除必需技能与许可证，并验证检查失败。测试目录离开时清理，不修改实际 skills 或来源仓库。
 
 ## 场景与隔离
 
-[scenarios.json](scenarios.json) 有 10 个场景，每个定义 fixture、用户输入、预期能力、正向断言和禁止行为：
+[scenarios.json](scenarios.json) 有 12 个场景，每个定义 fixture、用户输入、预期能力、正向断言和禁止行为：
 
 | ID | 观察对象 |
 | --- | --- |
@@ -42,6 +44,8 @@ python -B -X utf8 scripts/validate.py --source-root decision-notes=../decision-n
 | handoff-implicit | 保存有证据的交接，不顺手修代码 |
 | migration-planning-explicit | 授权目标保持 proposed，未实施时不取代当前 accepted |
 | interview-experiment-explicit | 明确验证动作及阻塞范围后收束访谈，不伪报假设成立 |
+| git-staged-preservation-explicit | 仅提交新功能与测试，保留用户已有 staged 内容和另一文件的 unstaged 修改 |
+| git-dirty-validation-explicit | 只读检查 HEAD、index 与工作目录，验证结论不混用不同快照 |
 
 先准备一个全新工作区：
 
@@ -49,14 +53,14 @@ python -B -X utf8 scripts/validate.py --source-root decision-notes=../decision-n
 python -B -X utf8 evals/prepare.py debug-explicit --mode full --model ACTUAL_MODEL --runtime ACTUAL_RUNNER_VERSION --loading-mode explicit-path
 ```
 
-[prepare.py](prepare.py) 默认在操作系统临时目录创建 `project/`，初始化该临时 Git 仓库，写入起点 commit，并应用场景的未提交修改。仅该 fixture 的 Git commit 用于建立测试基线，不提交技能源码或用户项目。也可使用 `--output` 指定仓库外**尚不存在**的目录；不会覆盖已有运行。
+[prepare.py](prepare.py) 默认在操作系统临时目录创建 `project/`，初始化该临时 Git 仓库，写入起点 commit，并应用场景的未提交修改。Git 场景通过 `staged_paths` 将指定文件暂存，另外保留 unstaged 修改；该字段只能指向项目内的相对路径。包含暂存设置的 fixture 使用局部合成 Git 身份，不改全局配置。仅该 fixture 的 Git commit 用于建立测试基线，不提交技能源码或用户项目。也可使用 `--output` 指定仓库外**尚不存在**的目录；不会覆盖已有运行。
 
 每次输出包含：
 
 - `project/`：交给执行 agent 的工作区。
 - `prompt.txt`：原样交给执行 agent 的本轮请求。
 - `rubric.json`：留给评估者的断言和后续用户回答，**不要预先交给执行 agent**。
-- `run.json`：fixture/场景/技能包 SHA、分发清单 SHA、起点、文件快照、模型和加载方式。初始状态始终是 `not_run`。
+- `run.json`：fixture/场景/技能包 SHA、分发清单 SHA、起点、文件快照、初始 index 条目和已跟踪差异的摘要哈希、模型和加载方式。初始状态始终是 `not_run`；index 摘要辅助核对初始状态，不代替完整 diff 或验证证据。
 
 支持 `baseline`（不安装本套技能）、`minimal`（decision-notes + implement-work）和 `full`（全部技能）。显式场景只有在技能实际安装时才给 prompt 加技能名与路径；其他模式使用相同业务请求。三种模式的共同项目说明相同。独立工作区不能自动屏蔽宿主的全局技能、系统指令或记忆；比较时必须记录并控制这些环境差异。
 
@@ -83,5 +87,7 @@ python -B -X utf8 evals/record.py C:/TEMP/RUN --trace C:/TEMP/trace.txt --model 
 ## 已保存的试用
 
 [2026-09-29 记录](results/2026-09-29-smoke.json) 包含 5 个 full 模式、显式路径加载的单次试用：2 个 `pass`，3 个因原始过程证据不完整而为 `inconclusive`；另 5 个场景未运行。记录附实际证据文件、哈希、产物和可取得的测试输出。解读与限制见[验证记录](../docs/validation.md)，不能视作整套评测或对照实验已经通过。
+
+[2026-09-30 Git 记录](results/2026-09-30-git-smoke.json) 包含两个新增场景的同类单次试用。父级核查提交范围、已有修改与暂存状态，并在最终提交快照复跑 8 个测试；只读场景的最终状态和验证对象说明也已核查。两例均缺少完整原始交互或工具轨迹，受影响的过程判据保留 `not_observed`，正式状态为 `inconclusive`，不把已核查的产物结果扩为整例通过。
 
 公开记录已脱敏本机用户和路径；文件头及报告 `publication` 字段说明修改范围。`evidence_sha256` 对应公开字节，`original_evidence_sha256` 对应私有备份的原始字节，不能混用。私有原件不纳入 Git。

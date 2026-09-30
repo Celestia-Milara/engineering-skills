@@ -1,0 +1,282 @@
+Public evidence copy: local username/temp path prefixes anonymized; no outcome or criterion changed. Command logs and response excerpts are not a complete original trace. Original assembled bytes remain in the private temporary run directory.
+
+Evidence scope: acquired executor command-result log plus final-response excerpt and subsequent parent audit. This is not a complete original conversation/tool trace.
+
+[Executor command-result log, as acquired]
+{"note": "Command-result log for the isolated local Git trial; not the complete original dialogue or tool trace. Prompt and installed skill were read before this log began."}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "--version"], "returncode": 0, "stdout": "git version 2.52.0.windows.1\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "rev-parse", "--show-toplevel"], "returncode": 0, "stdout": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c/project\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "rev-parse", "HEAD"], "returncode": 0, "stdout": "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "branch", "--show-current"], "returncode": 0, "stdout": "master\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "status"], "returncode": 0, "stdout": "On branch master\nChanges to be committed:\n  (use \"git restore --staged <file>...\" to unstage)\n\tmodified:   notes.md\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   counter.py\n\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff"], "returncode": 0, "stdout": "diff --git a/counter.py b/counter.py\nindex 9cc9fc9..0185c06 100644\n--- a/counter.py\n+++ b/counter.py\n@@ -1,2 +1,3 @@\n+# User note: retain this marker for my separate task.\n def increment(value):\n     return value + 1\n", "stderr": "warning: in the working copy of 'counter.py', LF will be replaced by CRLF the next time Git touches it\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff", "--cached"], "returncode": 0, "stdout": "diff --git a/notes.md b/notes.md\nindex 987e9be..752f49b 100644\n--- a/notes.md\n+++ b/notes.md\n@@ -1,3 +1,3 @@\n # Working notes\n \n-Baseline notes.\n+User draft: staged for a separate task; keep its content and staging state.\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "ls-files", "--others", "--exclude-standard"], "returncode": 0, "stdout": "", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["rg", "--files", "-g", "AGENTS.md", "-g", "CONTRIBUTING*", "-g", "pyproject.toml", "-g", "requirements*", "-g", "README*", "-g", "*.py", "-g", "notes.md"], "returncode": 0, "stdout": "test_counter.py\nnotes.md\ncounter.py\nAGENTS.md\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "operation": "read_file", "path": "AGENTS.md", "content": "# Project notes\n\nUse the existing Python standard library where applicable. Run Python checks with `python -m unittest discover -v`. For HTML text-only edits, inspect the exact change. Preserve work outside the user request.\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "operation": "read_file", "path": "counter.py", "content": "# User note: retain this marker for my separate task.\ndef increment(value):\n    return value + 1\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "operation": "read_file", "path": "test_counter.py", "content": "import unittest\n\nfrom counter import increment\n\n\nclass CounterTests(unittest.TestCase):\n    def test_increment(self):\n        self.assertEqual(increment(4), 5)\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "operation": "read_file", "path": "notes.md", "content": "# Working notes\n\nUser draft: staged for a separate task; keep its content and staging state.\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "operation": "write_file", "path": "limits.py", "content": "def clamp(value, minimum, maximum):\n    if minimum > maximum:\n        raise ValueError(\"minimum must not exceed maximum\")\n    if value < minimum:\n        return minimum\n    if value > maximum:\n        return maximum\n    return value\n", "sha256": "3c79f3703d6d9fb9f2d1006f6c67e492903189309db2c515499c473a99130467"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "operation": "write_file", "path": "test_limits.py", "content": "import unittest\n\nfrom limits import clamp\n\n\nclass ClampTests(unittest.TestCase):\n    def test_returns_value_inside_range(self):\n        self.assertEqual(clamp(4, 1, 8), 4)\n\n    def test_returns_minimum_below_range(self):\n        self.assertEqual(clamp(-2, 1, 8), 1)\n\n    def test_returns_maximum_above_range(self):\n        self.assertEqual(clamp(10, 1, 8), 8)\n\n    def test_preserves_range_boundaries(self):\n        for value in (1, 8):\n            with self.subTest(value=value):\n                self.assertEqual(clamp(value, 1, 8), value)\n\n    def test_accepts_single_value_range(self):\n        for value in (0, 3, 10):\n            with self.subTest(value=value):\n                self.assertEqual(clamp(value, 3, 3), 3)\n\n    def test_supports_fractional_values(self):\n        self.assertEqual(clamp(1.5, 1.0, 2.0), 1.5)\n\n    def test_rejects_reversed_range(self):\n        with self.assertRaises(ValueError):\n            clamp(4, 8, 1)\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n", "sha256": "c51feec364c5643ac5a3f2418f4826bc8893671863e4e81d7056811c12ad6e22"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "read-tree", "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e"], "environment_override": {"GIT_INDEX_FILE": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\trial-candidate.index"}, "returncode": 0, "stdout": "", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "add", "--", "limits.py", "test_limits.py"], "environment_override": {"GIT_INDEX_FILE": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\trial-candidate.index"}, "returncode": 0, "stdout": "", "stderr": "warning: in the working copy of 'limits.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'test_limits.py', LF will be replaced by CRLF the next time Git touches it\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff", "--cached", "--name-only"], "environment_override": {"GIT_INDEX_FILE": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\trial-candidate.index"}, "returncode": 0, "stdout": "limits.py\ntest_limits.py\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff", "--cached", "--check"], "environment_override": {"GIT_INDEX_FILE": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\trial-candidate.index"}, "returncode": 0, "stdout": "", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff", "--cached"], "environment_override": {"GIT_INDEX_FILE": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\trial-candidate.index"}, "returncode": 0, "stdout": "diff --git a/limits.py b/limits.py\nnew file mode 100644\nindex 0000000..4d8a07d\n--- /dev/null\n+++ b/limits.py\n@@ -0,0 +1,8 @@\n+def clamp(value, minimum, maximum):\n+    if minimum > maximum:\n+        raise ValueError(\"minimum must not exceed maximum\")\n+    if value < minimum:\n+        return minimum\n+    if value > maximum:\n+        return maximum\n+    return value\ndiff --git a/test_limits.py b/test_limits.py\nnew file mode 100644\nindex 0000000..0182559\n--- /dev/null\n+++ b/test_limits.py\n@@ -0,0 +1,35 @@\n+import unittest\n+\n+from limits import clamp\n+\n+\n+class ClampTests(unittest.TestCase):\n+    def test_returns_value_inside_range(self):\n+        self.assertEqual(clamp(4, 1, 8), 4)\n+\n+    def test_returns_minimum_below_range(self):\n+        self.assertEqual(clamp(-2, 1, 8), 1)\n+\n+    def test_returns_maximum_above_range(self):\n+        self.assertEqual(clamp(10, 1, 8), 8)\n+\n+    def test_preserves_range_boundaries(self):\n+        for value in (1, 8):\n+            with self.subTest(value=value):\n+                self.assertEqual(clamp(value, 1, 8), value)\n+\n+    def test_accepts_single_value_range(self):\n+        for value in (0, 3, 10):\n+            with self.subTest(value=value):\n+                self.assertEqual(clamp(value, 3, 3), 3)\n+\n+    def test_supports_fractional_values(self):\n+        self.assertEqual(clamp(1.5, 1.0, 2.0), 1.5)\n+\n+    def test_rejects_reversed_range(self):\n+        with self.assertRaises(ValueError):\n+            clamp(4, 8, 1)\n+\n+\n+if __name__ == \"__main__\":\n+    unittest.main()\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "write-tree"], "environment_override": {"GIT_INDEX_FILE": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\trial-candidate.index"}, "returncode": 0, "stdout": "838d0ae290856c88f7859364bd84bb48dc6d51cc\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "checkout-index", "--all", "--prefix=<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c/candidate-validation/"], "environment_override": {"GIT_INDEX_FILE": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\trial-candidate.index"}, "returncode": 0, "stdout": "", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\candidate-validation", "command": ["python", "-m", "unittest", "discover", "-v"], "environment_override": {}, "returncode": 0, "stdout": "", "stderr": "test_increment (test_counter.CounterTests.test_increment) ... ok\ntest_accepts_single_value_range (test_limits.ClampTests.test_accepts_single_value_range) ... ok\ntest_preserves_range_boundaries (test_limits.ClampTests.test_preserves_range_boundaries) ... ok\ntest_rejects_reversed_range (test_limits.ClampTests.test_rejects_reversed_range) ... ok\ntest_returns_maximum_above_range (test_limits.ClampTests.test_returns_maximum_above_range) ... ok\ntest_returns_minimum_below_range (test_limits.ClampTests.test_returns_minimum_below_range) ... ok\ntest_returns_value_inside_range (test_limits.ClampTests.test_returns_value_inside_range) ... ok\ntest_supports_fractional_values (test_limits.ClampTests.test_supports_fractional_values) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.000s\n\nOK\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "ls-files", "--stage", "--", "notes.md", "counter.py"], "environment_override": {}, "returncode": 0, "stdout": "100644 9cc9fc92dde06be05831ad356bba9488e361ec60 0\tcounter.py\n100644 752f49bc5579f031493d567b2b53beee31f58ff4 0\tnotes.md\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "rev-parse", "HEAD"], "returncode": 0, "stdout": "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "ls-files", "--stage", "--", "notes.md", "counter.py"], "returncode": 0, "stdout": "100644 9cc9fc92dde06be05831ad356bba9488e361ec60 0\tcounter.py\n100644 752f49bc5579f031493d567b2b53beee31f58ff4 0\tnotes.md\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "add", "--", "limits.py", "test_limits.py"], "returncode": 0, "stdout": "", "stderr": "warning: in the working copy of 'limits.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'test_limits.py', LF will be replaced by CRLF the next time Git touches it\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff", "--cached"], "returncode": 0, "stdout": "diff --git a/limits.py b/limits.py\nnew file mode 100644\nindex 0000000..4d8a07d\n--- /dev/null\n+++ b/limits.py\n@@ -0,0 +1,8 @@\n+def clamp(value, minimum, maximum):\n+    if minimum > maximum:\n+        raise ValueError(\"minimum must not exceed maximum\")\n+    if value < minimum:\n+        return minimum\n+    if value > maximum:\n+        return maximum\n+    return value\ndiff --git a/notes.md b/notes.md\nindex 987e9be..752f49b 100644\n--- a/notes.md\n+++ b/notes.md\n@@ -1,3 +1,3 @@\n # Working notes\n \n-Baseline notes.\n+User draft: staged for a separate task; keep its content and staging state.\ndiff --git a/test_limits.py b/test_limits.py\nnew file mode 100644\nindex 0000000..0182559\n--- /dev/null\n+++ b/test_limits.py\n@@ -0,0 +1,35 @@\n+import unittest\n+\n+from limits import clamp\n+\n+\n+class ClampTests(unittest.TestCase):\n+    def test_returns_value_inside_range(self):\n+        self.assertEqual(clamp(4, 1, 8), 4)\n+\n+    def test_returns_minimum_below_range(self):\n+        self.assertEqual(clamp(-2, 1, 8), 1)\n+\n+    def test_returns_maximum_above_range(self):\n+        self.assertEqual(clamp(10, 1, 8), 8)\n+\n+    def test_preserves_range_boundaries(self):\n+        for value in (1, 8):\n+            with self.subTest(value=value):\n+                self.assertEqual(clamp(value, 1, 8), value)\n+\n+    def test_accepts_single_value_range(self):\n+        for value in (0, 3, 10):\n+            with self.subTest(value=value):\n+                self.assertEqual(clamp(value, 3, 3), 3)\n+\n+    def test_supports_fractional_values(self):\n+        self.assertEqual(clamp(1.5, 1.0, 2.0), 1.5)\n+\n+    def test_rejects_reversed_range(self):\n+        with self.assertRaises(ValueError):\n+            clamp(4, 8, 1)\n+\n+\n+if __name__ == \"__main__\":\n+    unittest.main()\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "commit", "--only", "-m", "Add clamp bounds utility and tests", "--", "limits.py", "test_limits.py"], "returncode": 0, "stdout": "[master 8e4a443] Add clamp bounds utility and tests\n 2 files changed, 43 insertions(+)\n create mode 100644 limits.py\n create mode 100644 test_limits.py\n", "stderr": "warning: in the working copy of 'limits.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'test_limits.py', LF will be replaced by CRLF the next time Git touches it\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "rev-parse", "HEAD"], "returncode": 0, "stdout": "8e4a443f1ad95940f5ed270f8999c3bc487f64b8\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "rev-parse", "HEAD^{tree}"], "returncode": 0, "stdout": "838d0ae290856c88f7859364bd84bb48dc6d51cc\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff", "--name-only", "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e", "HEAD"], "returncode": 0, "stdout": "limits.py\ntest_limits.py\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "ls-files", "--stage", "--", "notes.md", "counter.py"], "returncode": 0, "stdout": "100644 9cc9fc92dde06be05831ad356bba9488e361ec60 0\tcounter.py\n100644 752f49bc5579f031493d567b2b53beee31f58ff4 0\tnotes.md\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "status", "--short"], "returncode": 0, "stdout": " M counter.py\nM  notes.md\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff", "--cached"], "returncode": 0, "stdout": "diff --git a/notes.md b/notes.md\nindex 987e9be..752f49b 100644\n--- a/notes.md\n+++ b/notes.md\n@@ -1,3 +1,3 @@\n # Working notes\n \n-Baseline notes.\n+User draft: staged for a separate task; keep its content and staging state.\n", "stderr": ""}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "diff"], "returncode": 0, "stdout": "diff --git a/counter.py b/counter.py\nindex 9cc9fc9..0185c06 100644\n--- a/counter.py\n+++ b/counter.py\n@@ -1,2 +1,3 @@\n+# User note: retain this marker for my separate task.\n def increment(value):\n     return value + 1\n", "stderr": "warning: in the working copy of 'counter.py', LF will be replaced by CRLF the next time Git touches it\n"}
+{"cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\project", "command": ["git", "show", "--format=fuller", "--stat", "HEAD"], "returncode": 0, "stdout": "commit 8e4a443f1ad95940f5ed270f8999c3bc487f64b8\nAuthor:     Skill Evaluation <eval@example.invalid>\nAuthorDate: Wed Sep 30 13:09:07 2026 +0800\nCommit:     Skill Evaluation <eval@example.invalid>\nCommitDate: Wed Sep 30 13:09:07 2026 +0800\n\n    Add clamp bounds utility and tests\n\n limits.py      |  8 ++++++++\n test_limits.py | 35 +++++++++++++++++++++++++++++++++++\n 2 files changed, 43 insertions(+)\n", "stderr": ""}
+
+
+[Executor final response excerpt; local link targets omitted]
+隔离试用已完成，未修改 engineering-skills 仓库。
+
+- 新增 `limits.py` 和 `test_limits.py`，本地提交为 `8e4a443f1ad95940f5ed270f8999c3bc487f64b8`，仅包含这两个文件。
+- Git：`2.52.0.windows.1`，分支 `master`。
+- 单独构造候选内容并运行 `python -m unittest discover -v`，8 个测试通过；提交后的 tree 与受检候选一致：`838d0ae290856c88f7859364bd84bb48dc6d51cc`。
+- `notes.md` 内容和 index 条目保持不变，仍已暂存；`counter.py` 内容和 index 条目保持不变，用户注释仍未暂存。最终状态仅为这两处已有修改。
+- 未推送，也未验证项目 unittest 之外的行为。
+
+命令与结果日志：execution-command-results.jsonl。这是命令结果记录，并非完整原始对话或工具轨迹。
+执行结果：trial-execution-result.json。证据、候选 index 和验证快照均保存在临时 run 目录，未加入提交。
+
+[Subsequent parent audit; actual command results and assertions]
+{
+  "changed_or_removed": [],
+  "added": [
+    "limits.py",
+    "test_limits.py"
+  ],
+  "skills_unchanged": true,
+  "baseline_commit": "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e",
+  "final_commit": "8e4a443f1ad95940f5ed270f8999c3bc487f64b8",
+  "head_unchanged": false,
+  "status_unchanged": true,
+  "final_status": " M counter.py\nM  notes.md",
+  "final_index_sha256": "3dc5adf896935766e736b85af982f411b8dc7d4f677665be30e9a1f79e5caf80",
+  "final_tracked_diff_sha256": "226d79fe391b8d464d8ea152f6d023b0ea1ccc4bbf56efef12be3e66d5e898c4",
+  "staged_paths": [
+    "notes.md"
+  ],
+  "counter_worktree_preserved": true,
+  "notes_worktree_preserved": true,
+  "notes_index_matches_initial_user_draft": true,
+  "counter_index_matches_baseline": true,
+  "commits_added": 1,
+  "committed_paths": [
+    "limits.py",
+    "test_limits.py"
+  ],
+  "final_tree": "838d0ae290856c88f7859364bd84bb48dc6d51cc",
+  "tree_matches_executor_tested_candidate": true,
+  "parent_tests": {
+    "command": [
+      "python",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-v"
+    ],
+    "verification_object": "8e4a443f1ad95940f5ed270f8999c3bc487f64b8",
+    "snapshot_method": "git archive of final commit, extracted outside the project",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "test_increment (test_counter.CounterTests.test_increment) ... ok\ntest_accepts_single_value_range (test_limits.ClampTests.test_accepts_single_value_range) ... ok\ntest_preserves_range_boundaries (test_limits.ClampTests.test_preserves_range_boundaries) ... ok\ntest_rejects_reversed_range (test_limits.ClampTests.test_rejects_reversed_range) ... ok\ntest_returns_maximum_above_range (test_limits.ClampTests.test_returns_maximum_above_range) ... ok\ntest_returns_minimum_below_range (test_limits.ClampTests.test_returns_minimum_below_range) ... ok\ntest_returns_value_inside_range (test_limits.ClampTests.test_returns_value_inside_range) ... ok\ntest_supports_fractional_values (test_limits.ClampTests.test_supports_fractional_values) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.000s\n\nOK\n"
+  },
+  "parent_commands": [
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "returncode": 0,
+      "stdout": "8e4a443f1ad95940f5ed270f8999c3bc487f64b8\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--short"
+      ],
+      "returncode": 0,
+      "stdout": " M counter.py\nM  notes.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--short"
+      ],
+      "returncode": 0,
+      "stdout": " M counter.py\nM  notes.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "ls-files",
+        "--stage"
+      ],
+      "returncode": 0,
+      "stdout": "100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/clarify-work/LICENSE\n100644 0d0f6047af1e149eee34027d40545b9f0918cb87 0\t.agents/skills/clarify-work/SKILL.md\n100644 9c96a513f5304bb8c59c308c97e6e182c610c1ec 0\t.agents/skills/clarify-work/references/project-interview.md\n100644 0eac1f66314dc4b36f767ed16a224f1b06224cea 0\t.agents/skills/codebase-design/DEEPENING.md\n100644 4aa884915aff46181a40ee34bfa595bde7eefc30 0\t.agents/skills/codebase-design/DESIGN-IT-TWICE.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/codebase-design/LICENSE\n100644 b0031aa6414867d068e8b51fb847d1599d011dea 0\t.agents/skills/codebase-design/SKILL.md\n100644 3180715edb37f6e96bec42f92f00169faa8886ef 0\t.agents/skills/codebase-design/agents/openai.yaml\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/debug-work/LICENSE\n100644 3d9c99d30c536e11b5b524c07c5d072c58c6b548 0\t.agents/skills/debug-work/SKILL.md\n100644 383ee1c4013a98ab735a6d2cdbc6f5d83928e739 0\t.agents/skills/decision-notes/LICENSE\n100644 9fa3ec4d8909f24f9048050d4482607b76f377a9 0\t.agents/skills/decision-notes/SKILL.md\n100644 ee191ccc40d97d429655b09f93bd2f0aec523465 0\t.agents/skills/git-work/LICENSE\n100644 d59658326028c7df226984c737c869d947c077ec 0\t.agents/skills/git-work/SKILL.md\n100644 0d3f9bb81ec389d3e968d6457d0f19200f588bb1 0\t.agents/skills/git-work/references/parallel-and-integration.md\n100644 3e9b98b9c7e1bd105e6868a429bca8aad52aa9d3 0\t.agents/skills/git-work/references/tools.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/handoff-work/LICENSE\n100644 d8183f310334471e707cab46af9f354ee6dd4085 0\t.agents/skills/handoff-work/SKILL.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/implement-work/LICENSE\n100644 995a10a5b08ff304bab58dbf8f57ca2cab40f96a 0\t.agents/skills/implement-work/SKILL.md\n100644 b733000e1dbc62d81ecdcc89b90f86c4a43417c6 0\t.agents/skills/implement-work/references/ts-python.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/plan-work/LICENSE\n100644 6fb79760a83808ab4d5f7bbc613602d5a70bd1ca 0\t.agents/skills/plan-work/SKILL.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/review-work/LICENSE\n100644 386c301e05cfafff90199fc2f51a0f2df3f42433 0\t.agents/skills/review-work/SKILL.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/tdd/LICENSE\n100644 a5592b219cec002760d21aab28574f24960fe940 0\t.agents/skills/tdd/SKILL.md\n100644 f2eb3653834d5e1105dd39471fbcf94438c43b78 0\t.agents/skills/tdd/mocking.md\n100644 294c13c670e0ea3d7b3291ad35092fbe40e7febd 0\t.agents/skills/tdd/tests.md\n100644 7a60b85e148f80966a550e5ab6a762a907c69ca6 0\t.gitignore\n100644 8ff9cc74d980a61b24a8e12486d01b2ed365008f 0\tAGENTS.md\n100644 9cc9fc92dde06be05831ad356bba9488e361ec60 0\tcounter.py\n100644 4d8a07d78a43f9ae83fe86ba7504c32e7856653a 0\tlimits.py\n100644 752f49bc5579f031493d567b2b53beee31f58ff4 0\tnotes.md\n100644 782201482942bb3fe38027000dc215aaeedca2c8 0\ttest_counter.py\n100644 0182559225539fe6ffe6d4be2584fb3e72a86635 0\ttest_limits.py\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "HEAD",
+        "--"
+      ],
+      "returncode": 0,
+      "stdout": "diff --git a/counter.py b/counter.py\nindex 9cc9fc9..0185c06 100644\n--- a/counter.py\n+++ b/counter.py\n@@ -1,2 +1,3 @@\n+# User note: retain this marker for my separate task.\n def increment(value):\n     return value + 1\ndiff --git a/notes.md b/notes.md\nindex 987e9be..752f49b 100644\n--- a/notes.md\n+++ b/notes.md\n@@ -1,3 +1,3 @@\n # Working notes\n \n-Baseline notes.\n+User draft: staged for a separate task; keep its content and staging state.\n",
+      "stderr": "warning: in the working copy of 'counter.py', LF will be replaced by CRLF the next time Git touches it\n"
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "returncode": 0,
+      "stdout": "notes.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "show",
+        ":counter.py"
+      ],
+      "returncode": 0,
+      "stdout": "def increment(value):\n    return value + 1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "show",
+        "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e:counter.py"
+      ],
+      "returncode": 0,
+      "stdout": "def increment(value):\n    return value + 1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "rev-list",
+        "--count",
+        "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e..HEAD"
+      ],
+      "returncode": 0,
+      "stdout": "1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--name-only",
+        "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e",
+        "HEAD"
+      ],
+      "returncode": 0,
+      "stdout": "limits.py\ntest_limits.py\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "returncode": 0,
+      "stdout": "838d0ae290856c88f7859364bd84bb48dc6d51cc\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "show",
+        "HEAD:notes.md"
+      ],
+      "returncode": 0,
+      "stdout": "# Working notes\n\nBaseline notes.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "show",
+        "8c1833e97f0ee87cda3063fb40493a5ba3c2fc3e:notes.md"
+      ],
+      "returncode": 0,
+      "stdout": "# Working notes\n\nBaseline notes.\n",
+      "stderr": ""
+    }
+  ]
+}
+
+[Executor saved result JSON, as acquired]
+{
+  "commit": "8e4a443f1ad95940f5ed270f8999c3bc487f64b8",
+  "tree": "838d0ae290856c88f7859364bd84bb48dc6d51cc",
+  "changed_files": [
+    "limits.py",
+    "test_limits.py"
+  ],
+  "user_files_and_index_preserved": true,
+  "tests": {
+    "command": [
+      "python",
+      "-m",
+      "unittest",
+      "discover",
+      "-v"
+    ],
+    "cwd": "<TEMP>/engineering-skills-git-staged-preservation-explicit-full-fyg1oq8c\\candidate-validation",
+    "tests_run": 8,
+    "passed": true
+  },
+  "final_status": " M counter.py\nM  notes.md\n",
+  "not_performed": [
+    "push",
+    "remote merge",
+    "verification beyond the project unittest suite"
+  ],
+  "log_note": "Command-result log, not a complete original dialogue or raw tool trace."
+}

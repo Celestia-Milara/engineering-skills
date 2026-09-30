@@ -40,7 +40,8 @@ class EvaluationFixtureTests(unittest.TestCase):
                 "--criterion", f"claim-boundary={result}"]
 
     def test_modes_control_installed_skills_without_claiming_execution(self):
-        for mode, expected in (("baseline", 0), ("minimal", 2), ("full", 9)):
+        all_skills = {path.name for path in (ROOT / "skills").iterdir() if path.is_dir()}
+        for mode, expected in (("baseline", 0), ("minimal", 2), ("full", len(all_skills))):
             with self.subTest(mode=mode):
                 run_dir = prepare_module.prepare("debug-explicit", mode, self.root / mode)
                 run = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
@@ -53,6 +54,34 @@ class EvaluationFixtureTests(unittest.TestCase):
                 self.assertFalse((run_dir / "project" / "rubric.json").exists())
                 prompt = (run_dir / "prompt.txt").read_text(encoding="utf-8")
                 self.assertEqual("$debug-work" in prompt, mode == "full")
+                if mode == "full":
+                    self.assertEqual(set(run["installed_skills"]), all_skills)
+
+    def test_git_fixture_has_distinct_staged_and_unstaged_user_changes(self):
+        run_dir = prepare_module.prepare("git-staged-preservation-explicit", "full", self.root / "git-staged")
+        run = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+        project = run_dir / "project"
+        self.assertIn("M  notes.md", run["starting_status"])
+        self.assertIn(" M counter.py", run["starting_status"])
+        self.assertEqual(prepare_module.git(project, "diff", "--cached", "--name-only"), "notes.md")
+        self.assertIn("User draft", prepare_module.git(project, "show", ":notes.md"))
+        self.assertNotIn("User draft", prepare_module.git(project, "show", "HEAD:notes.md"))
+        self.assertEqual(len(run["starting_index_sha256"]), 64)
+        self.assertEqual(len(run["starting_tracked_diff_sha256"]), 64)
+        self.assertIn("$git-work", (run_dir / "prompt.txt").read_text(encoding="utf-8"))
+
+    def test_staged_setup_rejects_paths_outside_project(self):
+        suite = json.loads((ROOT / "evals" / "scenarios.json").read_text(encoding="utf-8"))
+        case = next(case for case in suite["cases"] if case["id"] == "git-staged-preservation-explicit")
+        case["staged_paths"] = ["../foreign-file.txt"]
+        original_loads = json.loads
+
+        def staged_suite(value, *args, **kwargs):
+            parsed = original_loads(value, *args, **kwargs)
+            return suite if isinstance(parsed, dict) and "cases" in parsed else parsed
+
+        with mock.patch.object(prepare_module.json, "loads", side_effect=staged_suite), self.assertRaises(ValueError):
+            prepare_module.prepare(case["id"], "baseline", self.root / "unsafe-staged")
 
     def test_review_has_tracked_and_untracked_changes(self):
         run_dir = prepare_module.prepare("review-untracked-explicit", "baseline", self.root / "review")

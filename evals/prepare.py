@@ -6,7 +6,7 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
 import tempfile
@@ -27,7 +27,7 @@ def inventory(directory):
 def git(project, *args):
     return subprocess.run(["git", "-c", "user.name=Skill Evaluation", "-c", "user.email=eval@example.invalid", *args],
                           cwd=project, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                          text=True, encoding="utf-8").stdout.strip()
+                          text=True, encoding="utf-8").stdout.rstrip("\r\n")
 
 
 def prepare(case_id, mode, output=None, model="unrecorded", runtime="unrecorded", loading_mode="unrecorded"):
@@ -68,6 +68,19 @@ def prepare(case_id, mode, output=None, model="unrecorded", runtime="unrecorded"
     baseline_commit = git(project, "rev-parse", "HEAD")
     if (fixture / "pending").is_dir():
         shutil.copytree(fixture / "pending", project, dirs_exist_ok=True)
+    staged_paths = case.get("staged_paths", [])
+    if not isinstance(staged_paths, list) or any(not isinstance(value, str) for value in staged_paths):
+        raise ValueError("staged_paths must be an array of relative file paths")
+    for value in staged_paths:
+        parsed = PurePosixPath(value)
+        if (not value or parsed.is_absolute() or ".." in parsed.parts or "\\" in value or ":" in value
+                or not (project / value).resolve().is_relative_to(project.resolve())):
+            raise ValueError(f"Unsafe staged fixture path: {value}")
+    if staged_paths:
+        git(project, "add", "--", *staged_paths)
+        # Synthetic identity is confined to this disposable repository, never global config.
+        git(project, "config", "user.name", "Skill Evaluation")
+        git(project, "config", "user.email", "eval@example.invalid")
 
     prompt = case["prompt"]
     explicit = case.get("explicit_skill")
@@ -82,6 +95,8 @@ def prepare(case_id, mode, output=None, model="unrecorded", runtime="unrecorded"
         "prepared_at": datetime.now(timezone.utc).isoformat(), "project": str(project),
         "model": model, "runtime": runtime, "skill_loading_mode": loading_mode, "installed_skills": installed,
         "baseline_commit": baseline_commit, "starting_status": git(project, "status", "--short"),
+        "starting_index_sha256": digest(git(project, "ls-files", "--stage").encode()),
+        "starting_tracked_diff_sha256": digest(git(project, "diff", "HEAD", "--").encode()),
         "fixture_sha256": digest(json.dumps(inventory(fixture), sort_keys=True).encode()),
         "scenario_sha256": digest(json.dumps(case, ensure_ascii=False, sort_keys=True).encode()),
         "skills_sha256": digest(json.dumps(inventory(ROOT / "skills"), sort_keys=True).encode()),

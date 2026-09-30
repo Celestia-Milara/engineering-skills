@@ -8,10 +8,11 @@
 
 ## 项目来源
 
-本套技能基于以下两个项目改编：
+本套技能保留以下两个项目的改编内容，并新增本库原创的 Git 工作技能：
 
 - **[decision-notes-skill](https://github.com/Celestia-Milara/decision-notes-skill)**：由本项目作者 **Celestia-Milara** 维护。该项目是根据 **dsh 开发团队在开发 dsh 时使用的 notes** 改造而来的轻量版；本套技能中的 `decision-notes` 在此基础上进一步改编，用于保存长期决策的原因与约束。
-- **[mattpocock/skills](https://github.com/mattpocock/skills)**：由 **Matt Pocock** 维护。本套技能中其余 8 个 skills 均根据该项目的相关技能改造，结合本套决策记录方式调整流程、适用条件和参考材料，并进行中文改编。
+- **[mattpocock/skills](https://github.com/mattpocock/skills)**：由 **Matt Pocock** 维护。本套技能中 8 个既有 skills 根据该项目的相关技能改造，结合本套决策记录方式调整流程、适用条件和参考材料，并进行中文改编。
+- **git-work**：本库原创，规定任务变更归属、提交、并行工作区、验证和集成边界；AgentGit / Git AI 调研作为按需参考，不作为工具依赖。
 
 具体来源映射见下表，固定上游版本及文件哈希见 [sources.json](sources.json)。上游版权声明和许可证保留在各技能目录及 [来源与许可证说明](THIRD_PARTY_NOTICES.md) 中。
 
@@ -28,6 +29,7 @@
 | [tdd](skills/tdd/SKILL.md) | 用户要求测试先行，或行为变化适合自动回归 | 改编入口与参考，统一行为断言、替身及集成证据的边界 |
 | [codebase-design](skills/codebase-design/SKILL.md) | 模块接口、复杂性归属、可测试性需要设计 | 改编 Matt 的深模块方法，将适用条件与执行退路随技能分发 |
 | [handoff-work](skills/handoff-work/SKILL.md) | 用户需要跨会话继续或交接当前工作 | 改编 handoff，把恢复入口留在项目内 |
+| [git-work](skills/git-work/SKILL.md) | 提交、并行工作区、分支集成、冲突或恢复 | 本库原创，可独立安装，不默认提交或引入工具 |
 
 “改编”表示独立维护的技能，不会同步覆盖来源仓库。`decision-notes`、`tdd` 和 `codebase-design` 沿用来源名称，接入时选择本版或来源版之一；切换时比较规则，避免同名入口并存。
 
@@ -45,6 +47,7 @@
 | 模块越来越难改 | codebase-design → plan-work / implement-work | 有依据的接口调整；必要时更新决策笔记 |
 | 只想检查代码 | review-work | 可定位、有影响说明的发现，不自动改代码 |
 | 下次继续 | handoff-work | 当前事实、验证记录、下一步与文件链接 |
+| 已授权提交、并行分支集成或 Git 恢复 | git-work，按操作读取参考 | 本任务提交、实际版本与验证、可恢复状态 |
 
 这里的箭头表示可以组合，不是每次强制执行的流水线。只请求讨论或计划时，在相应产物处结束；已授权实现时不为每一步重新请求批准。
 
@@ -57,6 +60,7 @@
 用 implement-work 完成这个计划的第一个切片。
 用 debug-work 查出重复保存的原因，再修复并验证。
 用 review-work 检查当前尚未提交的所有改动，包括新增文件。
+用 git-work 提交这次已验证的修复，保留我原有的暂存内容，不推送。
 ```
 
 ## 接入项目
@@ -65,17 +69,19 @@
 
 1. 将选中的 `skills/<name>/` **整个目录**复制到目标项目的 `.agents/skills/<name>/`，保留参考文件、元数据和 LICENSE。不要把本仓库根目录复制进去。
 2. 已有同名 skill 时先比较内容，选择一个版本；本版 decision-notes 已调整生命周期语义，不把它当作原版的逐字节副本。
-3. 把 [AGENTS.snippet.md](templates/AGENTS.snippet.md) 中与已安装技能对应的条目合并进项目 `AGENTS.md`，保留项目原有说明和命令。
+3. 新项目按 [AGENTS.example.md](AGENTS.example.md) 填写真实目录、命令与已安装技能，删除占位和不适用条目，将其中代码块保存为 `AGENTS.md`。已有项目只合并 [AGENTS.snippet.md](templates/AGENTS.snippet.md) 所需条目，保留原有说明和命令；两种方式中的 Git 底线均可独立使用。
 4. 新项目无需创建空的 CONTEXT、计划或决策文件。现有决策笔记和已接入的校验器继续使用。
 
-最小组合：`decision-notes` + `implement-work`。需要测试先行和评审时再加 `tdd`、`review-work`；也可以一次复制全部 9 个技能。必需依赖如下，其他技能缺席时入口有直接执行相应检查的退路：
+最小组合仍是 `decision-notes` + `implement-work`。需要测试先行和评审时再加 `tdd`、`review-work`；需要 Git 操作时可加 `git-work`，也可以一次复制全部 10 个技能。必需依赖如下，其他技能缺席时入口有直接执行相应检查的退路：
 
 | 选择的技能 | 一并安装 |
 | --- | --- |
 | clarify-work、plan-work、implement-work、review-work、debug-work、tdd、handoff-work | decision-notes |
-| decision-notes、codebase-design | 无其他必需 skill |
+| decision-notes、codebase-design、git-work | 无其他必需 skill |
 
 `codebase-design` 的测试保留条件与无多 agent 时的退路已在技能内定义，AGENTS 片段只提供项目级入口。
+
+`git-work` 不成为其他技能的必需依赖。共享工作区的修改与暂存保护也保留在执行技能中；任务完成不自动触发提交，项目要启用自动本地提交时在 `AGENTS.md` 明确约定。并行任务复用已有计划和交接，不新增 `.agentgit` 状态体系；工具用途和实现限制见其按需读取的 [AgentGit / Git AI 参考](skills/git-work/references/tools.md)。
 
 不需要为使用技能安装 Node.js。需要决策笔记自动校验时，从原 `decision-notes-skill/template/` 按原项目说明接入相应校验器，合并配置，**不要覆盖目标项目的 package.json、CI 或 AGENTS.md**。本库不复制第二套校验器，避免规则与实现分叉。
 
@@ -121,7 +127,7 @@ python -m unittest discover -s tests -v
 
 不要用上游更新直接覆盖改编技能。先对照 `sources.json` 的版本与修改说明，挑选需要的变化；原样复用的文件可逐文件比较后更新。许可证保留在各技能目录及 `licenses/` 中。
 
-`sources.json` 的 `source_files[].sha256` 是固定 commit 的 Git blob 字节哈希，`distributed_sha256` 是当前分发文件字节哈希。修改后审核差异、确认处理方式，再更新分发哈希；源哈希只随明确的来源升级更新。`verbatim` 表示字节一致，`translated` 表示仅翻译，改变规则属于 `adapted`。校验器不会替你接受文件漂移。
+`sources.json` 的 `source_files[].sha256` 是固定 commit 的 Git blob 字节哈希，`distributed_sha256` 是当前分发文件字节哈希。修改后审核差异、确认处理方式，再更新分发哈希；源哈希只随明确的来源升级更新。`verbatim` 表示字节一致，`translated` 表示仅翻译，改变上游规则属于 `adapted`。本库原创文件标为 `original`，`source_files` 为空数组，`skill_sources` 使用保留值 `original`，许可证映射到根目录 `LICENSE`；不为原创内容虚构上游提交或源哈希。校验器不会替你接受文件漂移。
 
 ## 许可证与贡献
 

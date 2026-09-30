@@ -20,6 +20,7 @@ class PackageValidationTests(unittest.TestCase):
         for name in ("skills", "licenses"):
             shutil.copytree(ROOT / name, self.root / name)
         shutil.copy2(ROOT / "sources.json", self.root / "sources.json")
+        shutil.copy2(ROOT / "LICENSE", self.root / "LICENSE")
 
     def codes(self, **kwargs):
         return {issue["code"] for issue in validator.validate(self.root, **kwargs)["issues"]}
@@ -51,6 +52,35 @@ class PackageValidationTests(unittest.TestCase):
 
     def test_minimal_selection_passes(self):
         self.assertFalse(self.codes(selected={"decision-notes", "implement-work"}))
+
+    def test_original_skill_can_be_selected_alone(self):
+        self.assertFalse(self.codes(selected={"git-work"}))
+
+    def test_original_distribution_drift_is_detected(self):
+        path = self.root / "skills" / "git-work" / "SKILL.md"
+        path.write_bytes(path.read_bytes() + b"\nUnreviewed original change.\n")
+        self.assertIn("hash.distributed", self.codes())
+
+    def test_original_provenance_rejects_upstream_claim(self):
+        manifest_path = self.root / "sources.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        adapted = next(entry for entry in manifest["files"] if entry["treatment"] == "adapted")
+        original = next(entry for entry in manifest["files"] if entry["destination"] == "skills/git-work/SKILL.md")
+        original["source_files"] = adapted["source_files"]
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.assertIn("manifest.original", self.codes())
+
+    def test_original_mapping_must_match_entrypoint(self):
+        manifest_path = self.root / "sources.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["skill_sources"]["git-work"] = "mattpocock"
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.assertIn("manifest.original", self.codes())
+
+    def test_original_license_must_match_package_license(self):
+        license_path = self.root / "skills" / "git-work" / "LICENSE"
+        license_path.write_bytes(license_path.read_bytes() + b"\nChanged license.\n")
+        self.assertIn("license.content", self.codes())
 
     def test_detects_license_loss(self):
         (self.root / "skills" / "tdd" / "LICENSE").unlink()

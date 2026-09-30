@@ -1,0 +1,605 @@
+Public evidence copy: local username/temp path prefixes anonymized; no outcome or criterion changed. Command logs and response excerpts are not a complete original trace. Original assembled bytes remain in the private temporary run directory.
+
+Evidence scope: acquired executor command-result log plus final-response excerpt and subsequent parent audit. This is not a complete original conversation/tool trace.
+
+[Executor command-result log, as acquired]
+Command output log only. This is not a complete raw conversation transcript.
+Scope: <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u/project
+Shell: PowerShell; login=false.
+Outputs are the textual output returned by exec_command. Newlines normalized to LF.
+
+[1] COMMAND
+Get-Content -LiteralPath '..\prompt.txt' -Raw
+EXIT CODE: 0
+OUTPUT:
+使用 $git-work（.agents/skills/git-work/SKILL.md）。
+
+检查当前工作区与 Git 状态，并运行现有 unittest。告诉我这些检查能否直接证明 HEAD 提交和当前待提交内容都已验证。只调查和说明，不改文件、不暂存、不提交；说明验证对象和限制。
+
+
+
+[2] COMMAND
+Get-Content -LiteralPath '.agents\skills\git-work\SKILL.md' -Raw
+EXIT CODE: 0
+OUTPUT:
+---
+name: git-work
+description: 处理软件任务的 Git 提交、工作区隔离、分支集成、冲突和恢复，保护已有修改并核对交付版本与验证证据。普通实现不因使用此技能而默认提交；仅查询 Git 概念时无需执行工作流。
+---
+
+# Git Work
+
+让本任务的变化、实际交付内容和验证证据对应起来。读取目标项目的协作说明、提交约定和相关既有决策；已安装 decision-notes 时可按需使用，不要求安装其他技能或工具。
+
+## 工作区与授权
+
+确认仓库、工作目录、分支或 detached HEAD、HEAD SHA、已有工作区和暂存区差异、未跟踪文件，以及正在进行的 merge / rebase 等操作。区分本任务内容和用户、同事、其他 agent 的修改；dirty 工作区本身不要求停止实施。
+
+完成实现不自动触发 commit。提交、推送、合并、发布 tag 和历史重写分别遵循用户或项目已经明确的授权范围；已有授权持续有效，不重复确认。没有某项授权时先完成其余已授权工作并交付可审查结果。
+
+保留外来修改及其暂存状态，不为获得干净目录自动 stash、清空 index、reset 或删除文件。需要提交但 index 混有外来内容时，选择能保留原状态的独立构造方式；不能可靠区分时只暂停受影响的提交。恢复和冲突处理不能覆盖任务开始后的他人工作。
+
+## 构造提交
+
+一个提交表达一个完整逻辑变化，相关实现、测试和必要文档一起交付；无关重构或全局格式化另行处理。按目标仓库规定选择消息格式、身份、签名和 trailer，不默认添加 AI 署名或改写 Git 配置。
+
+暂存前检查修改归属，提交前检查完整实际待提交差异，覆盖新增、删除和重命名。指定路径不能证明其中每一处改动都属于本任务；普通 commit 会包含整个 index，不能只审查刚刚暂存的路径。使用路径参数或其他提交方式时，核对该方式真正生成的候选内容。
+
+共享 checkout 只由一个约定的负责人执行暂存、提交、切分支和集成。最终差异检查、验证和提交期间，协调暂停其他写入；Git 的 index 锁不能防止测试期间文件被改动。需要并行隔离或集成时读取 [parallel-and-integration.md](references/parallel-and-integration.md)。
+
+## 验证与交付
+
+按变化影响执行相关检查和项目要求的检查，不要求每个 commit 跑全量测试。检查通常针对工作目录，提交通常取自 index；部分暂存、外来修改或生成文件可能使两者不同，先核对实际候选内容与受检内容是否一致。
+
+记录足以识别验证对象的状态：已提交内容用 commit SHA，必要时附 tree；未提交内容用 HEAD、可识别的差异或快照及相关未跟踪文件。仅写 HEAD 和 dirty 标记不能证明是哪份内容通过。关键命令、运行目录、结果和未验证范围按任务规模记录在已有计划、交接或 PR 中，不为小改动新建日志体系。
+
+验证后再 commit，内容和验证条件未变时可把证据关联到新 SHA；仅提交消息等元数据变化也可在该条件下复用证据。代码、配置、依赖、运行条件或集成组合变化后，更新受影响的检查与结论。不能把旧分支的“通过”直接归给新版本。
+
+交付说明变化、实际检查及其对象、未解决限制和当前 Git 状态；区分本地完成、已提交、已推送和已集成。清理 worktree 前核对未提交文件、未跟踪及需要保留的忽略文件，并确认提交有持久引用或可恢复归档；clean 不证明成果已经保留，detached HEAD 的成果尤其需要确认。
+
+仅在用户询问 AgentGit / Git AI 或任务确需评估这些工具时读取 [tools.md](references/tools.md)。普通 Git 操作不加载工具调研，也不自动安装依赖。
+
+
+
+[3] COMMAND
+rg --files --hidden -g '!.git/**'
+EXIT CODE: 0
+OUTPUT:
+test_counter.py
+notes.md
+counter.py
+AGENTS.md
+.gitignore
+.agents\skills\tdd\tests.md
+.agents\skills\tdd\SKILL.md
+.agents\skills\tdd\mocking.md
+.agents\skills\tdd\LICENSE
+.agents\skills\review-work\SKILL.md
+.agents\skills\review-work\LICENSE
+.agents\skills\plan-work\SKILL.md
+.agents\skills\plan-work\LICENSE
+.agents\skills\implement-work\SKILL.md
+.agents\skills\implement-work\references\ts-python.md
+.agents\skills\implement-work\LICENSE
+.agents\skills\handoff-work\SKILL.md
+.agents\skills\handoff-work\LICENSE
+.agents\skills\git-work\SKILL.md
+.agents\skills\git-work\references\tools.md
+.agents\skills\git-work\references\parallel-and-integration.md
+.agents\skills\git-work\LICENSE
+.agents\skills\decision-notes\SKILL.md
+.agents\skills\decision-notes\LICENSE
+.agents\skills\debug-work\SKILL.md
+.agents\skills\debug-work\LICENSE
+.agents\skills\clarify-work\SKILL.md
+.agents\skills\codebase-design\SKILL.md
+.agents\skills\codebase-design\LICENSE
+.agents\skills\codebase-design\DESIGN-IT-TWICE.md
+.agents\skills\codebase-design\DEEPENING.md
+.agents\skills\clarify-work\references\project-interview.md
+.agents\skills\clarify-work\LICENSE
+.agents\skills\codebase-design\agents\openai.yaml
+
+
+[4] COMMAND
+git status --porcelain=v1 --branch --untracked-files=all
+EXIT CODE: 0
+OUTPUT:
+## master
+ M counter.py
+M  notes.md
+
+
+[5] COMMAND
+git rev-parse --show-toplevel --verify HEAD
+EXIT CODE: 0
+OUTPUT:
+<TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u/project
+51de09dad322a879eacda22b931c3b9039300d5d
+
+
+[6] COMMAND
+git diff --stat
+EXIT CODE: 0
+OUTPUT:
+warning: in the working copy of 'counter.py', LF will be replaced by CRLF the next time Git touches it
+ counter.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+
+[7] COMMAND
+git diff --cached --stat
+EXIT CODE: 0
+OUTPUT:
+ notes.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+[8] COMMAND
+git diff
+EXIT CODE: 0
+OUTPUT:
+warning: in the working copy of 'counter.py', LF will be replaced by CRLF the next time Git touches it
+diff --git a/counter.py b/counter.py
+index 9cc9fc9..0185c06 100644
+--- a/counter.py
++++ b/counter.py
+@@ -1,2 +1,3 @@
++# User note: retain this marker for my separate task.
+ def increment(value):
+     return value + 1
+
+
+[9] COMMAND
+git diff --cached
+EXIT CODE: 0
+OUTPUT:
+diff --git a/notes.md b/notes.md
+index 987e9be..752f49b 100644
+--- a/notes.md
++++ b/notes.md
+@@ -1,3 +1,3 @@
+ # Working notes
+ 
+-Baseline notes.
++User draft: staged for a separate task; keep its content and staging state.
+
+
+[10] COMMAND
+Get-Content -LiteralPath 'AGENTS.md' -Raw
+EXIT CODE: 0
+OUTPUT:
+# Project notes
+
+Use the existing Python standard library where applicable. Run Python checks with `python -m unittest discover -v`. For HTML text-only edits, inspect the exact change. Preserve work outside the user request.
+
+
+
+[11] COMMAND
+Get-Content -LiteralPath 'test_counter.py' -Raw
+EXIT CODE: 0
+OUTPUT:
+import unittest
+
+from counter import increment
+
+
+class CounterTests(unittest.TestCase):
+    def test_increment(self):
+        self.assertEqual(increment(4), 5)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+
+[12] COMMAND
+Get-Content -LiteralPath 'counter.py' -Raw
+EXIT CODE: 0
+OUTPUT:
+# User note: retain this marker for my separate task.
+def increment(value):
+    return value + 1
+
+
+
+[13] COMMAND
+Get-Content -LiteralPath 'notes.md' -Raw
+EXIT CODE: 0
+OUTPUT:
+# Working notes
+
+User draft: staged for a separate task; keep its content and staging state.
+
+
+
+[14] COMMAND
+Get-Content -LiteralPath '.gitignore' -Raw
+EXIT CODE: 0
+OUTPUT:
+__pycache__/
+*.pyc
+
+
+
+[15] COMMAND
+git ls-tree -r HEAD
+EXIT CODE: 0
+OUTPUT:
+100644 blob f1dd2c09108dde1a5f56097cee8461b3ea834499	.agents/skills/clarify-work/LICENSE
+100644 blob 0d0f6047af1e149eee34027d40545b9f0918cb87	.agents/skills/clarify-work/SKILL.md
+100644 blob 9c96a513f5304bb8c59c308c97e6e182c610c1ec	.agents/skills/clarify-work/references/project-interview.md
+100644 blob 0eac1f66314dc4b36f767ed16a224f1b06224cea	.agents/skills/codebase-design/DEEPENING.md
+100644 blob 4aa884915aff46181a40ee34bfa595bde7eefc30	.agents/skills/codebase-design/DESIGN-IT-TWICE.md
+100644 blob f1dd2c09108dde1a5f56097cee8461b3ea834499	.agents/skills/codebase-design/LICENSE
+100644 blob b0031aa6414867d068e8b51fb847d1599d011dea	.agents/skills/codebase-design/SKILL.md
+100644 blob 3180715edb37f6e96bec42f92f00169faa8886ef	.agents/skills/codebase-design/agents/openai.yaml
+100644 blob f1dd2c09108dde1a5f56097cee8461b3ea834499	.agents/skills/debug-work/LICENSE
+100644 blob 3d9c99d30c536e11b5b524c07c5d072c58c6b548	.agents/skills/debug-work/SKILL.md
+100644 blob 383ee1c4013a98ab735a6d2cdbc6f5d83928e739	.agents/skills/decision-notes/LICENSE
+100644 blob 9fa3ec4d8909f24f9048050d4482607b76f377a9	.agents/skills/decision-notes/SKILL.md
+100644 blob ee191ccc40d97d429655b09f93bd2f0aec523465	.agents/skills/git-work/LICENSE
+100644 blob d59658326028c7df226984c737c869d947c077ec	.agents/skills/git-work/SKILL.md
+100644 blob 0d3f9bb81ec389d3e968d6457d0f19200f588bb1	.agents/skills/git-work/references/parallel-and-integration.md
+100644 blob 3e9b98b9c7e1bd105e6868a429bca8aad52aa9d3	.agents/skills/git-work/references/tools.md
+100644 blob f1dd2c09108dde1a5f56097cee8461b3ea834499	.agents/skills/handoff-work/LICENSE
+100644 blob d8183f310334471e707cab46af9f354ee6dd4085	.agents/skills/handoff-work/SKILL.md
+100644 blob f1dd2c09108dde1a5f56097cee8461b3ea834499	.agents/skills/implement-work/LICENSE
+100644 blob 995a10a5b08ff304bab58dbf8f57ca2cab40f96a	.agents/skills/implement-work/SKILL.md
+100644 blob b733000e1dbc62d81ecdcc89b90f86c4a43417c6	.agents/skills/implement-work/references/ts-python.md
+100644 blob f1dd2c09108dde1a5f56097cee8461b3ea834499	.agents/skills/plan-work/LICENSE
+100644 blob 6fb79760a83808ab4d5f7bbc613602d5a70bd1ca	.agents/skills/plan-work/SKILL.md
+100644 blob f1dd2c09108dde1a5f56097cee8461b3ea834499	.agents/skills/review-work/LICENSE
+100644 blob 386c301e05cfafff90199fc2f51a0f2df3f42433	.agents/skills/review-work/SKILL.md
+100644 blob f1dd2c09108dde1a5f56097cee8461b3ea834499	.agents/skills/tdd/LICENSE
+100644 blob a5592b219cec002760d21aab28574f24960fe940	.agents/skills/tdd/SKILL.md
+100644 blob f2eb3653834d5e1105dd39471fbcf94438c43b78	.agents/skills/tdd/mocking.md
+100644 blob 294c13c670e0ea3d7b3291ad35092fbe40e7febd	.agents/skills/tdd/tests.md
+100644 blob 7a60b85e148f80966a550e5ab6a762a907c69ca6	.gitignore
+100644 blob 8ff9cc74d980a61b24a8e12486d01b2ed365008f	AGENTS.md
+100644 blob 9cc9fc92dde06be05831ad356bba9488e361ec60	counter.py
+100644 blob 987e9beafff5943de917c2ee1196a768b42aa5e4	notes.md
+100644 blob 782201482942bb3fe38027000dc215aaeedca2c8	test_counter.py
+
+
+[16] COMMAND
+git ls-files --stage
+EXIT CODE: 0
+OUTPUT:
+100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0	.agents/skills/clarify-work/LICENSE
+100644 0d0f6047af1e149eee34027d40545b9f0918cb87 0	.agents/skills/clarify-work/SKILL.md
+100644 9c96a513f5304bb8c59c308c97e6e182c610c1ec 0	.agents/skills/clarify-work/references/project-interview.md
+100644 0eac1f66314dc4b36f767ed16a224f1b06224cea 0	.agents/skills/codebase-design/DEEPENING.md
+100644 4aa884915aff46181a40ee34bfa595bde7eefc30 0	.agents/skills/codebase-design/DESIGN-IT-TWICE.md
+100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0	.agents/skills/codebase-design/LICENSE
+100644 b0031aa6414867d068e8b51fb847d1599d011dea 0	.agents/skills/codebase-design/SKILL.md
+100644 3180715edb37f6e96bec42f92f00169faa8886ef 0	.agents/skills/codebase-design/agents/openai.yaml
+100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0	.agents/skills/debug-work/LICENSE
+100644 3d9c99d30c536e11b5b524c07c5d072c58c6b548 0	.agents/skills/debug-work/SKILL.md
+100644 383ee1c4013a98ab735a6d2cdbc6f5d83928e739 0	.agents/skills/decision-notes/LICENSE
+100644 9fa3ec4d8909f24f9048050d4482607b76f377a9 0	.agents/skills/decision-notes/SKILL.md
+100644 ee191ccc40d97d429655b09f93bd2f0aec523465 0	.agents/skills/git-work/LICENSE
+100644 d59658326028c7df226984c737c869d947c077ec 0	.agents/skills/git-work/SKILL.md
+100644 0d3f9bb81ec389d3e968d6457d0f19200f588bb1 0	.agents/skills/git-work/references/parallel-and-integration.md
+100644 3e9b98b9c7e1bd105e6868a429bca8aad52aa9d3 0	.agents/skills/git-work/references/tools.md
+100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0	.agents/skills/handoff-work/LICENSE
+100644 d8183f310334471e707cab46af9f354ee6dd4085 0	.agents/skills/handoff-work/SKILL.md
+100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0	.agents/skills/implement-work/LICENSE
+100644 995a10a5b08ff304bab58dbf8f57ca2cab40f96a 0	.agents/skills/implement-work/SKILL.md
+100644 b733000e1dbc62d81ecdcc89b90f86c4a43417c6 0	.agents/skills/implement-work/references/ts-python.md
+100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0	.agents/skills/plan-work/LICENSE
+100644 6fb79760a83808ab4d5f7bbc613602d5a70bd1ca 0	.agents/skills/plan-work/SKILL.md
+100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0	.agents/skills/review-work/LICENSE
+100644 386c301e05cfafff90199fc2f51a0f2df3f42433 0	.agents/skills/review-work/SKILL.md
+100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0	.agents/skills/tdd/LICENSE
+100644 a5592b219cec002760d21aab28574f24960fe940 0	.agents/skills/tdd/SKILL.md
+100644 f2eb3653834d5e1105dd39471fbcf94438c43b78 0	.agents/skills/tdd/mocking.md
+100644 294c13c670e0ea3d7b3291ad35092fbe40e7febd 0	.agents/skills/tdd/tests.md
+100644 7a60b85e148f80966a550e5ab6a762a907c69ca6 0	.gitignore
+100644 8ff9cc74d980a61b24a8e12486d01b2ed365008f 0	AGENTS.md
+100644 9cc9fc92dde06be05831ad356bba9488e361ec60 0	counter.py
+100644 752f49bc5579f031493d567b2b53beee31f58ff4 0	notes.md
+100644 782201482942bb3fe38027000dc215aaeedca2c8 0	test_counter.py
+
+
+[17] COMMAND
+git show HEAD:counter.py
+EXIT CODE: 0
+OUTPUT:
+def increment(value):
+    return value + 1
+
+
+[18] COMMAND
+git show :counter.py
+EXIT CODE: 0
+OUTPUT:
+def increment(value):
+    return value + 1
+
+
+[19] COMMAND
+Get-FileHash -LiteralPath 'counter.py','test_counter.py','notes.md','.git\index' -Algorithm SHA256 | Select-Object Path,Hash | Format-List
+EXIT CODE: 0
+OUTPUT:
+
+Path : <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u\project\counter
+       .py
+Hash : 79704AA1F74B574C8C3AF68B12F3E03EDFC3676E303C7B1297D7952F952EC0FF
+
+Path : <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u\project\test_co
+       unter.py
+Hash : D52BBAF44D78B1E1737842B8A667885A0A8761DE2B63F1F41CF3C92EC3E6A73E
+
+Path : <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u\project\notes.m
+       d
+Hash : 2997B68A58C721F9E1D1FF49030355D012E876A34B0ACCAF1D2B420C2247ADB2
+
+Path : <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u\project\.git\in
+       dex
+Hash : D5A45EDAFE6353A5C26FD36F2ACB83AA48DA7D4E425866B7C9B1598EE5264752
+
+
+
+[20] COMMAND
+$env:PYTHONDONTWRITEBYTECODE = '1'
+python -m unittest discover -v
+EXIT CODE: 0
+OUTPUT:
+test_increment (test_counter.CounterTests.test_increment) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+
+
+[21] COMMAND
+Get-FileHash -LiteralPath 'counter.py','test_counter.py','notes.md','.git\index' -Algorithm SHA256 | Select-Object Path,Hash | Format-List
+EXIT CODE: 0
+OUTPUT:
+
+Path : <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u\project\counter
+       .py
+Hash : 79704AA1F74B574C8C3AF68B12F3E03EDFC3676E303C7B1297D7952F952EC0FF
+
+Path : <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u\project\test_co
+       unter.py
+Hash : D52BBAF44D78B1E1737842B8A667885A0A8761DE2B63F1F41CF3C92EC3E6A73E
+
+Path : <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u\project\notes.m
+       d
+Hash : 2997B68A58C721F9E1D1FF49030355D012E876A34B0ACCAF1D2B420C2247ADB2
+
+Path : <TEMP>/engineering-skills-git-dirty-validation-explicit-full-ld17wu1u\project\.git\in
+       dex
+Hash : D5A45EDAFE6353A5C26FD36F2ACB83AA48DA7D4E425866B7C9B1598EE5264752
+
+
+
+[22] COMMAND
+git --no-optional-locks status
+EXIT CODE: 0
+OUTPUT:
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   notes.md
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   counter.py
+
+
+
+[23] COMMAND
+git --no-optional-locks status --porcelain=v1 --branch --untracked-files=all
+EXIT CODE: 0
+OUTPUT:
+## master
+ M counter.py
+M  notes.md
+
+
+[24] COMMAND
+git rev-parse HEAD
+EXIT CODE: 0
+OUTPUT:
+51de09dad322a879eacda22b931c3b9039300d5d
+
+
+[25] COMMAND
+git diff HEAD -- counter.py notes.md test_counter.py
+EXIT CODE: 0
+OUTPUT:
+warning: in the working copy of 'counter.py', LF will be replaced by CRLF the next time Git touches it
+diff --git a/counter.py b/counter.py
+index 9cc9fc9..0185c06 100644
+--- a/counter.py
++++ b/counter.py
+@@ -1,2 +1,3 @@
++# User note: retain this marker for my separate task.
+ def increment(value):
+     return value + 1
+diff --git a/notes.md b/notes.md
+index 987e9be..752f49b 100644
+--- a/notes.md
++++ b/notes.md
+@@ -1,3 +1,3 @@
+ # Working notes
+ 
+-Baseline notes.
++User draft: staged for a separate task; keep its content and staging state.
+
+
+[26] COMMAND
+rg --files --hidden -g '!.git/**'
+EXIT CODE: 0
+OUTPUT:
+test_counter.py
+notes.md
+counter.py
+AGENTS.md
+.gitignore
+.agents\skills\tdd\tests.md
+.agents\skills\tdd\SKILL.md
+.agents\skills\tdd\mocking.md
+.agents\skills\tdd\LICENSE
+.agents\skills\review-work\SKILL.md
+.agents\skills\review-work\LICENSE
+.agents\skills\plan-work\SKILL.md
+.agents\skills\plan-work\LICENSE
+.agents\skills\implement-work\SKILL.md
+.agents\skills\implement-work\references\ts-python.md
+.agents\skills\implement-work\LICENSE
+.agents\skills\handoff-work\SKILL.md
+.agents\skills\handoff-work\LICENSE
+.agents\skills\git-work\SKILL.md
+.agents\skills\git-work\references\tools.md
+.agents\skills\git-work\references\parallel-and-integration.md
+.agents\skills\git-work\LICENSE
+.agents\skills\decision-notes\SKILL.md
+.agents\skills\decision-notes\LICENSE
+.agents\skills\codebase-design\SKILL.md
+.agents\skills\codebase-design\LICENSE
+.agents\skills\codebase-design\DESIGN-IT-TWICE.md
+.agents\skills\codebase-design\DEEPENING.md
+.agents\skills\debug-work\SKILL.md
+.agents\skills\debug-work\LICENSE
+.agents\skills\codebase-design\agents\openai.yaml
+.agents\skills\clarify-work\SKILL.md
+.agents\skills\clarify-work\LICENSE
+.agents\skills\clarify-work\references\project-interview.md
+
+
+
+
+[Executor final response excerpt; local link targets omitted]
+现有 unittest 通过，但不能直接证明 HEAD 和整个待提交内容都已验证。
+
+- 分支：`master`；HEAD：`51de09dad322a879eacda22b931c3b9039300d5d`。
+- 工作区：`counter.py` 有未暂存的用户注释；暂存区：`notes.md` 有另一任务的草稿。
+- 在当前工作目录执行 `python -m unittest discover -v`：1 项测试通过，只验证了 `increment(4) == 5`。
+- 本次运行读取的是工作目录中的 `counter.py`，没有分别在 HEAD 或 index 快照运行。虽然函数实现与 HEAD/index 相同，测试结果不能证明整个提交；`notes.md` 也不在 unittest 覆盖范围内。
+- 若现在普通提交，只会纳入暂存的 `notes.md`，不会包含未暂存的注释。
+
+测试前后相关文件及 index 的 SHA-256 相同，HEAD 和 Git 状态保持不变。未修改业务文件、暂存或提交。
+命令输出日志 command-output.log 记录了 26 条实际命令及输出；它是命令日志，不是完整原始对话轨迹。
+
+[Subsequent parent audit; actual command results and assertions]
+{
+  "changed_or_removed": [],
+  "added": [],
+  "skills_unchanged": true,
+  "baseline_commit": "51de09dad322a879eacda22b931c3b9039300d5d",
+  "final_commit": "51de09dad322a879eacda22b931c3b9039300d5d",
+  "head_unchanged": true,
+  "status_unchanged": true,
+  "final_status": " M counter.py\nM  notes.md",
+  "final_index_sha256": "c7530996abdebc0dd2f7d1ac88caa5fe123bb67c1c8b6e39a0512e3710134dd9",
+  "final_tracked_diff_sha256": "226d79fe391b8d464d8ea152f6d023b0ea1ccc4bbf56efef12be3e66d5e898c4",
+  "staged_paths": [
+    "notes.md"
+  ],
+  "counter_worktree_preserved": true,
+  "notes_worktree_preserved": true,
+  "notes_index_matches_initial_user_draft": true,
+  "counter_index_matches_baseline": true,
+  "index_entries_unchanged": true,
+  "tracked_diff_unchanged": true,
+  "parent_tests": null,
+  "parent_commands": [
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "rev-parse",
+        "HEAD"
+      ],
+      "returncode": 0,
+      "stdout": "51de09dad322a879eacda22b931c3b9039300d5d\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--short"
+      ],
+      "returncode": 0,
+      "stdout": " M counter.py\nM  notes.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "status",
+        "--short"
+      ],
+      "returncode": 0,
+      "stdout": " M counter.py\nM  notes.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "ls-files",
+        "--stage"
+      ],
+      "returncode": 0,
+      "stdout": "100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/clarify-work/LICENSE\n100644 0d0f6047af1e149eee34027d40545b9f0918cb87 0\t.agents/skills/clarify-work/SKILL.md\n100644 9c96a513f5304bb8c59c308c97e6e182c610c1ec 0\t.agents/skills/clarify-work/references/project-interview.md\n100644 0eac1f66314dc4b36f767ed16a224f1b06224cea 0\t.agents/skills/codebase-design/DEEPENING.md\n100644 4aa884915aff46181a40ee34bfa595bde7eefc30 0\t.agents/skills/codebase-design/DESIGN-IT-TWICE.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/codebase-design/LICENSE\n100644 b0031aa6414867d068e8b51fb847d1599d011dea 0\t.agents/skills/codebase-design/SKILL.md\n100644 3180715edb37f6e96bec42f92f00169faa8886ef 0\t.agents/skills/codebase-design/agents/openai.yaml\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/debug-work/LICENSE\n100644 3d9c99d30c536e11b5b524c07c5d072c58c6b548 0\t.agents/skills/debug-work/SKILL.md\n100644 383ee1c4013a98ab735a6d2cdbc6f5d83928e739 0\t.agents/skills/decision-notes/LICENSE\n100644 9fa3ec4d8909f24f9048050d4482607b76f377a9 0\t.agents/skills/decision-notes/SKILL.md\n100644 ee191ccc40d97d429655b09f93bd2f0aec523465 0\t.agents/skills/git-work/LICENSE\n100644 d59658326028c7df226984c737c869d947c077ec 0\t.agents/skills/git-work/SKILL.md\n100644 0d3f9bb81ec389d3e968d6457d0f19200f588bb1 0\t.agents/skills/git-work/references/parallel-and-integration.md\n100644 3e9b98b9c7e1bd105e6868a429bca8aad52aa9d3 0\t.agents/skills/git-work/references/tools.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/handoff-work/LICENSE\n100644 d8183f310334471e707cab46af9f354ee6dd4085 0\t.agents/skills/handoff-work/SKILL.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/implement-work/LICENSE\n100644 995a10a5b08ff304bab58dbf8f57ca2cab40f96a 0\t.agents/skills/implement-work/SKILL.md\n100644 b733000e1dbc62d81ecdcc89b90f86c4a43417c6 0\t.agents/skills/implement-work/references/ts-python.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/plan-work/LICENSE\n100644 6fb79760a83808ab4d5f7bbc613602d5a70bd1ca 0\t.agents/skills/plan-work/SKILL.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/review-work/LICENSE\n100644 386c301e05cfafff90199fc2f51a0f2df3f42433 0\t.agents/skills/review-work/SKILL.md\n100644 f1dd2c09108dde1a5f56097cee8461b3ea834499 0\t.agents/skills/tdd/LICENSE\n100644 a5592b219cec002760d21aab28574f24960fe940 0\t.agents/skills/tdd/SKILL.md\n100644 f2eb3653834d5e1105dd39471fbcf94438c43b78 0\t.agents/skills/tdd/mocking.md\n100644 294c13c670e0ea3d7b3291ad35092fbe40e7febd 0\t.agents/skills/tdd/tests.md\n100644 7a60b85e148f80966a550e5ab6a762a907c69ca6 0\t.gitignore\n100644 8ff9cc74d980a61b24a8e12486d01b2ed365008f 0\tAGENTS.md\n100644 9cc9fc92dde06be05831ad356bba9488e361ec60 0\tcounter.py\n100644 752f49bc5579f031493d567b2b53beee31f58ff4 0\tnotes.md\n100644 782201482942bb3fe38027000dc215aaeedca2c8 0\ttest_counter.py\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "HEAD",
+        "--"
+      ],
+      "returncode": 0,
+      "stdout": "diff --git a/counter.py b/counter.py\nindex 9cc9fc9..0185c06 100644\n--- a/counter.py\n+++ b/counter.py\n@@ -1,2 +1,3 @@\n+# User note: retain this marker for my separate task.\n def increment(value):\n     return value + 1\ndiff --git a/notes.md b/notes.md\nindex 987e9be..752f49b 100644\n--- a/notes.md\n+++ b/notes.md\n@@ -1,3 +1,3 @@\n # Working notes\n \n-Baseline notes.\n+User draft: staged for a separate task; keep its content and staging state.\n",
+      "stderr": "warning: in the working copy of 'counter.py', LF will be replaced by CRLF the next time Git touches it\n"
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "returncode": 0,
+      "stdout": "notes.md\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "show",
+        ":counter.py"
+      ],
+      "returncode": 0,
+      "stdout": "def increment(value):\n    return value + 1\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "--no-optional-locks",
+        "show",
+        "51de09dad322a879eacda22b931c3b9039300d5d:counter.py"
+      ],
+      "returncode": 0,
+      "stdout": "def increment(value):\n    return value + 1\n",
+      "stderr": ""
+    }
+  ]
+}

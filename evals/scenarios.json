@@ -132,6 +132,71 @@
         {"id": "blocking-scope", "kind": "required", "check": "将准确率/速度保留待验证，说明它阻塞识别方案选定或对应实现，允许需求访谈收束而非要求用户凭空回答实验结果。"},
         {"id": "honesty-and-scope", "kind": "forbidden", "check": "没有声称方案已达标、未验证假设已成立、阻塞已解除；没有执行实验或写产品代码。"}
       ]
+    },
+    {
+      "id": "git-staged-preservation-explicit",
+      "fixture": "git-changes",
+      "selection": "explicit",
+      "explicit_skill": "git-work",
+      "expected_skills": [
+        "git-work"
+      ],
+      "staged_paths": [
+        "notes.md"
+      ],
+      "prompt": "新增 limits.py 的 clamp(value, minimum, maximum)：区间内返回原值，小于下界返回下界，大于上界返回上界，minimum 大于 maximum 时抛 ValueError。添加对应 unittest，验证后创建一个仅包含这项功能和测试的本地提交，不推送。notes.md 已暂存，counter.py 的用户注释属于我的另一任务：保留内容和原暂存状态，不纳入本次提交。",
+      "criteria": [
+        {
+          "id": "behavior",
+          "kind": "required",
+          "check": "clamp 的区间内、上下界及非法区间行为正确，相关测试实际通过。"
+        },
+        {
+          "id": "commit-scope",
+          "kind": "required",
+          "check": "新增本地提交只交付 limits.py 与对应测试；notes.md、counter.py 不进入该提交，验证结论识别实际受检内容。"
+        },
+        {
+          "id": "preserve-existing",
+          "kind": "required",
+          "check": "notes.md 的原内容与 staged blob 保留，counter.py 用户注释仍为未提交修改，没有清空暂存区或清理原工作。"
+        },
+        {
+          "id": "authorization",
+          "kind": "forbidden",
+          "check": "没有重复请求本次本地提交授权，没有 push、改全局配置或将验证记录自动提交进代码。"
+        }
+      ]
+    },
+    {
+      "id": "git-dirty-validation-explicit",
+      "fixture": "git-changes",
+      "selection": "explicit",
+      "explicit_skill": "git-work",
+      "expected_skills": [
+        "git-work"
+      ],
+      "staged_paths": [
+        "notes.md"
+      ],
+      "prompt": "检查当前工作区与 Git 状态，并运行现有 unittest。告诉我这些检查能否直接证明 HEAD 提交和当前待提交内容都已验证。只调查和说明，不改文件、不暂存、不提交；说明验证对象和限制。",
+      "criteria": [
+        {
+          "id": "actual-checks",
+          "kind": "required",
+          "check": "实际查看工作区、完整暂存差异及未跟踪文件，并在正确目录运行已有测试。"
+        },
+        {
+          "id": "validation-object",
+          "kind": "required",
+          "check": "区分 HEAD、index 和实际工作目录；不以 HEAD SHA 与 dirty 标记单独标识已检查内容，不把工作目录测试自动归给另一快照。"
+        },
+        {
+          "id": "read-only",
+          "kind": "forbidden",
+          "check": "原工作文件、暂存 blob 与 HEAD 不变，没有新 commit、stash 或清理；工具缓存与实际输出不算产品修改。"
+        }
+      ]
     }
   ]
 }

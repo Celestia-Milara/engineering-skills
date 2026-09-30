@@ -91,7 +91,7 @@
           "sha256": "77f3cf31bc99b2f49af943222526531fcc9fc41d047626d3640e875e85af3e84"
         }
       ],
-      "distributed_sha256": "656853ac5503c2e32e8dd43fd4cf45320c302debacf39c942ca0a8f6f5f42cb5"
+      "distributed_sha256": "5e875c255672eed81a61f31ddff673a360264e56842192f40d52fd43700f2aad"
     },
     {
       "destination": "skills/decision-notes/SKILL.md",
@@ -115,7 +115,7 @@
           "sha256": "7c62de979fdc7ac32fb5ddb2146156c917f80ee070d30fadc9d40343c4b6ed25"
         }
       ],
-      "distributed_sha256": "b0d8b7df41c9bee80612d98f2036a094ccf7fba8d0cbacd77245be60ee81870d"
+      "distributed_sha256": "862aee3e3340daf699f33fbdadd6e9aeb807d5aaf4cc4c147db3dde77c797acb"
     },
     {
       "destination": "skills/implement-work/SKILL.md",
@@ -127,7 +127,7 @@
           "sha256": "6d3fd9e83b8f36e5213854779db49b256a457a7ebb4a503e53fa7dcff696adc3"
         }
       ],
-      "distributed_sha256": "33507a2ac6b5e6b1eb216e10cb486270b1f8b16b983215b66c9aabf8e7a3b5a0"
+      "distributed_sha256": "bfca54abe97e8a6d784cb2a584dbc96390d5c531fa1268de96ac761f588f9da2"
     },
     {
       "destination": "skills/plan-work/SKILL.md",
@@ -144,7 +144,7 @@
           "sha256": "5c9fba69845c2519b9b35b9af42ae5142c21f8ca15ac2123dc2722002c8058ae"
         }
       ],
-      "distributed_sha256": "47a53174baaf3190703584aeb952b7df80e0f576b96e2e379cdbb5d64acb69a2"
+      "distributed_sha256": "2ab61ff772a928ec710014f11f3e3878bad519f1662eba16b2aad538c674d340"
     },
     {
       "destination": "skills/review-work/SKILL.md",
@@ -156,7 +156,7 @@
           "sha256": "47f4e52c21694def9c7c11cbfbf891ca35eac7a93e395797515be3c8a409ae50"
         }
       ],
-      "distributed_sha256": "ba5675b62cd5426eeff89146bece59d148bf1f921e13718c3fd401c5de580b2b"
+      "distributed_sha256": "a65738d5a45967aee598c21097c0a1e7a3864dd989fc31e14434c36a9b6d8b66"
     },
     {
       "destination": "skills/tdd/SKILL.md",
@@ -193,6 +193,24 @@
         }
       ],
       "distributed_sha256": "546839cc00d965b82b8460102b97cff642595125ca1f2d001f1155870e3a5ade"
+    },
+    {
+      "destination": "skills/git-work/SKILL.md",
+      "treatment": "original",
+      "source_files": [],
+      "distributed_sha256": "5ef23db35d3ce14505a3acc93a9a957b8c2c0a44bbdae6db30438b95b264447f"
+    },
+    {
+      "destination": "skills/git-work/references/parallel-and-integration.md",
+      "treatment": "original",
+      "source_files": [],
+      "distributed_sha256": "8fe45a85e0e5f8a5e6f9b42a1467506671dd1f540e39b36dd2a8a259026b28d1"
+    },
+    {
+      "destination": "skills/git-work/references/tools.md",
+      "treatment": "original",
+      "source_files": [],
+      "distributed_sha256": "636886a9f0079ed10d272c0315c7f330c10563b92977ed9ad0b1d7432366fa65"
     }
   ],
   "skill_sources": {
@@ -204,7 +222,8 @@
     "implement-work": "mattpocock",
     "plan-work": "mattpocock",
     "review-work": "mattpocock",
-    "tdd": "mattpocock"
+    "tdd": "mattpocock",
+    "git-work": "original"
   },
   "skill_dependencies": {
     "clarify-work": [
@@ -229,11 +248,13 @@
     ],
     "tdd": [
       "decision-notes"
-    ]
+    ],
+    "git-work": []
   },
   "licenses": {
     "decision-notes": "licenses/decision-notes.LICENSE",
-    "mattpocock": "licenses/mattpocock.LICENSE"
+    "mattpocock": "licenses/mattpocock.LICENSE",
+    "original": "LICENSE"
   },
-  "provenance_notes": "Source hashes are SHA-256 of Git blobs at the recorded commits; distributed hashes cover actual package bytes. Adapted includes translated files with semantic changes. Original supporting guides project-interview.md and ts-python.md, package documentation, validation tools and eval fixtures are maintained here; they have no verbatim upstream counterpart. See docs/design.md. Neither upstream repository is modified."
+  "provenance_notes": "Source hashes are SHA-256 of Git blobs at the recorded commits; distributed hashes cover actual package bytes. Adapted includes translated files with semantic changes. The git-work skill and its references are original, with empty source_files and the package MIT license; no upstream commit or source hash is invented. Original supporting guides project-interview.md and ts-python.md, package documentation, validation tools and eval fixtures are maintained here. See docs/design.md. Neither upstream repository is modified."
 }
