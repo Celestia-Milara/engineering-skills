@@ -1,0 +1,657 @@
+{
+  "format_version": 1,
+  "allowed_modes": [
+    "full"
+  ],
+  "purpose": "Native discovery only; routing labels and rubric must stay outside the actor workspace.",
+  "criteria": [
+    {
+      "id": "selection",
+      "kind": "required",
+      "check": "Use native discovery and original host evidence to identify loaded skills. All expected_skills must load, allowed_skills are optional, and forbidden_skills must not load. Catalogue exposure or actor self-report is insufficient; missing discovery/tool coverage means not_observed."
+    },
+    {
+      "id": "scope",
+      "kind": "forbidden",
+      "check": "Inspect actual artifacts and covered tool events for compliance with the prompt's allowed changes and excluded work. Skill loading alone does not prove execution or scope compliance."
+    }
+  ],
+  "cases": [
+    {
+      "id": "trigger-feature-zh",
+      "language": "zh",
+      "fixture": "calculator",
+      "selection": "implicit",
+      "prompt": "给 total 增加 discount_percent 参数，默认 0，10% 折扣后 [10,20] 应为 27。拒绝区间 [0,100] 之外的折扣。实现并验证，不提交。",
+      "expected_skills": [
+        "implement-work"
+      ],
+      "allowed_skills": [
+        "decision-notes",
+        "tdd"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "plan-work",
+        "review-work"
+      ]
+    },
+    {
+      "id": "trigger-feature-en",
+      "language": "en",
+      "fixture": "calculator",
+      "selection": "implicit",
+      "prompt": "Add discount_percent to total, defaulting to zero. [10,20] with 10% off should return 27; reject discounts outside [0,100]. Implement and verify without committing.",
+      "expected_skills": [
+        "implement-work"
+      ],
+      "allowed_skills": [
+        "decision-notes",
+        "tdd"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "plan-work",
+        "review-work"
+      ]
+    },
+    {
+      "id": "trigger-debug-zh",
+      "language": "zh",
+      "fixture": "csv-average",
+      "selection": "implicit",
+      "prompt": "average.py 处理空 CSV 会崩溃。先实际复现并查清原因，再修到 API 返回 0.0、CLI 成功退出；保留非空行为，不提交。",
+      "expected_skills": [
+        "debug-work"
+      ],
+      "allowed_skills": [
+        "decision-notes",
+        "tdd",
+        "implement-work"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "git-work",
+        "handoff-work",
+        "plan-work",
+        "review-work"
+      ]
+    },
+    {
+      "id": "trigger-debug-en",
+      "language": "en",
+      "fixture": "csv-average",
+      "selection": "implicit",
+      "prompt": "average.py crashes on an empty CSV. Reproduce and diagnose the cause first, then fix the API to return 0.0 and the CLI to exit successfully. Preserve nonempty behavior; do not commit.",
+      "expected_skills": [
+        "debug-work"
+      ],
+      "allowed_skills": [
+        "decision-notes",
+        "tdd",
+        "implement-work"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "git-work",
+        "handoff-work",
+        "plan-work",
+        "review-work"
+      ]
+    },
+    {
+      "id": "trigger-review-zh",
+      "language": "zh",
+      "fixture": "review",
+      "selection": "implicit",
+      "prompt": "帮我评审全部未提交改动，包括新增文件，按 requirements.md 检查可观察行为。只报告有影响的问题和检查范围，不修改文件。",
+      "expected_skills": [
+        "review-work"
+      ],
+      "allowed_skills": [
+        "decision-notes"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-review-en",
+      "language": "en",
+      "fixture": "review",
+      "selection": "implicit",
+      "prompt": "Review all uncommitted changes, including new files, against requirements.md. Report actionable defects and the inspection scope. Do not edit files.",
+      "expected_skills": [
+        "review-work"
+      ],
+      "allowed_skills": [
+        "decision-notes"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-plan-zh",
+      "language": "zh",
+      "fixture": "migration",
+      "selection": "implicit",
+      "prompt": "我已决定用 SQLite 取代 JSON，save/load 的字典行为不变，旧数据无需迁移。只保存可验证的实施切片与目标决策，本轮不改代码。",
+      "expected_skills": [
+        "plan-work",
+        "decision-notes"
+      ],
+      "allowed_skills": [
+        "codebase-design"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-plan-en",
+      "language": "en",
+      "fixture": "migration",
+      "selection": "implicit",
+      "prompt": "I have chosen SQLite to replace JSON, preserving the dictionary behavior of save/load; old data need not migrate. Save a plan with verifiable slices and the target decision. Do not change product code this round.",
+      "expected_skills": [
+        "plan-work",
+        "decision-notes"
+      ],
+      "allowed_skills": [
+        "codebase-design"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-clarify-zh",
+      "language": "zh",
+      "fixture": "interview",
+      "selection": "implicit",
+      "prompt": "我只有一个模糊想法：给烘焙店做预订工具。请通过多轮追问和反例拷打需求、爽约假设及取消规则；先采访我，不要开始实现。",
+      "expected_skills": [
+        "clarify-work"
+      ],
+      "allowed_skills": [
+        "decision-notes",
+        "codebase-design"
+      ],
+      "forbidden_skills": [
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-clarify-en",
+      "language": "en",
+      "fixture": "interview",
+      "selection": "implicit",
+      "prompt": "I have a vague idea for a bakery preorder tool. Grill me through follow-up questions and counterexamples about requirements, no-shows, and cancellation rules. Interview me first; do not implement it.",
+      "expected_skills": [
+        "clarify-work"
+      ],
+      "allowed_skills": [
+        "decision-notes",
+        "codebase-design"
+      ],
+      "forbidden_skills": [
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-tdd-zh",
+      "language": "zh",
+      "fixture": "calculator",
+      "selection": "implicit",
+      "prompt": "请用测试先行的方法为 total 增加 0 到 100 的百分比折扣。先看到一个真实失败的行为断言，再完成最小实现，逐步补边界测试。不提交。",
+      "expected_skills": [
+        "tdd"
+      ],
+      "allowed_skills": [
+        "decision-notes",
+        "implement-work"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "plan-work",
+        "review-work"
+      ]
+    },
+    {
+      "id": "trigger-tdd-en",
+      "language": "en",
+      "fixture": "calculator",
+      "selection": "implicit",
+      "prompt": "Use test-driven development to add a percentage discount in [0,100] to total. Observe a real failing behavior assertion before the smallest implementation, then add boundary coverage incrementally. Do not commit.",
+      "expected_skills": [
+        "tdd"
+      ],
+      "allowed_skills": [
+        "decision-notes",
+        "implement-work"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "plan-work",
+        "review-work"
+      ]
+    },
+    {
+      "id": "trigger-handoff-zh",
+      "language": "zh",
+      "fixture": "csv-average",
+      "selection": "implicit",
+      "prompt": "我要换会话了。把空 CSV 问题的代码与测试现状、未验证假设及下一步保存为交接。不要顺手修复，也不要提交或发送给别人。",
+      "expected_skills": [
+        "handoff-work"
+      ],
+      "allowed_skills": [
+        "decision-notes"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-handoff-en",
+      "language": "en",
+      "fixture": "csv-average",
+      "selection": "implicit",
+      "prompt": "I'm switching conversations. Save a handoff covering the code and test state of the empty CSV issue, unverified assumptions, and next steps. Do not fix, commit, or send anything to anyone.",
+      "expected_skills": [
+        "handoff-work"
+      ],
+      "allowed_skills": [
+        "decision-notes"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-git-zh",
+      "language": "zh",
+      "fixture": "git-changes",
+      "selection": "implicit",
+      "staged_paths": [
+        "notes.md"
+      ],
+      "prompt": "审查 notes.md 已暂存的草稿后，只为它创建一个本地提交。counter.py 的用户注释属于另一任务，保留原内容和未暂存状态；不推送。",
+      "expected_skills": [
+        "git-work"
+      ],
+      "allowed_skills": [
+        "review-work"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "decision-notes",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-git-en",
+      "language": "en",
+      "fixture": "git-changes",
+      "selection": "implicit",
+      "staged_paths": [
+        "notes.md"
+      ],
+      "prompt": "Inspect the staged draft in notes.md and create a local commit containing only that draft. The user comment in counter.py belongs to another task; preserve its content and unstaged state. Do not push.",
+      "expected_skills": [
+        "git-work"
+      ],
+      "allowed_skills": [
+        "review-work"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "decision-notes",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-design-zh",
+      "language": "zh",
+      "fixture": "migration",
+      "selection": "implicit",
+      "prompt": "比较本项目 JSON/SQLite 存储模块的两种接口设计，讨论复杂性该封装在哪里、如何留下真实可测试的接缝。只分析设计，不实现、不保存计划。",
+      "expected_skills": [
+        "codebase-design",
+        "decision-notes"
+      ],
+      "allowed_skills": [],
+      "forbidden_skills": [
+        "clarify-work",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-design-en",
+      "language": "en",
+      "fixture": "migration",
+      "selection": "implicit",
+      "prompt": "Compare two interface designs for this project's JSON/SQLite storage module: where should complexity live, and what would make a real testable seam? Analyze the design only; do not implement or save a plan.",
+      "expected_skills": [
+        "codebase-design",
+        "decision-notes"
+      ],
+      "allowed_skills": [],
+      "forbidden_skills": [
+        "clarify-work",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-decisions-zh",
+      "language": "zh",
+      "fixture": "migration",
+      "selection": "implicit",
+      "prompt": "这个项目之前为何选择 JSON，没有用 SQLite？请检索已记录的设计理由、被否决方案和适用约束，只解释，不改任何文件。",
+      "expected_skills": [
+        "decision-notes"
+      ],
+      "allowed_skills": [],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-decisions-en",
+      "language": "en",
+      "fixture": "migration",
+      "selection": "implicit",
+      "prompt": "Why did this project choose JSON rather than SQLite? Look up the recorded design rationale, rejected alternatives, and applicable constraints. Explain only; do not change files.",
+      "expected_skills": [
+        "decision-notes"
+      ],
+      "allowed_skills": [],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-copy-zh",
+      "language": "zh",
+      "fixture": "copy-edit",
+      "selection": "negative",
+      "prompt": "把 index.html 的按钮文案 Submit 改为 Send，其余内容保持不变。",
+      "expected_skills": [
+        "implement-work"
+      ],
+      "allowed_skills": [
+        "decision-notes"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-copy-en",
+      "language": "en",
+      "fixture": "copy-edit",
+      "selection": "negative",
+      "prompt": "Change the button label in index.html from Submit to Send. Keep everything else unchanged.",
+      "expected_skills": [
+        "implement-work"
+      ],
+      "allowed_skills": [
+        "decision-notes"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-discuss-zh",
+      "language": "zh",
+      "fixture": "calculator",
+      "selection": "negative",
+      "prompt": "只讨论给 prices.total 加缓存的收益、失效风险与证据缺口。不实现，不新建文件，也不要开始测试工程。",
+      "expected_skills": [],
+      "allowed_skills": [
+        "decision-notes"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-discuss-en",
+      "language": "en",
+      "fixture": "calculator",
+      "selection": "negative",
+      "prompt": "Discuss only the benefits, invalidation risks, and evidence gaps of caching prices.total. Do not implement, create files, or start a testing project.",
+      "expected_skills": [],
+      "allowed_skills": [
+        "decision-notes"
+      ],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-translate-zh",
+      "language": "zh",
+      "fixture": "copy-edit",
+      "selection": "negative",
+      "prompt": "只把这句话翻译成英文：下次继续讨论计划。不要访问或修改项目文件。",
+      "expected_skills": [],
+      "allowed_skills": [],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "decision-notes",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-translate-en",
+      "language": "en",
+      "fixture": "copy-edit",
+      "selection": "negative",
+      "prompt": "Translate this sentence into Chinese only: We will discuss the plan next time. Do not inspect or change project files.",
+      "expected_skills": [],
+      "allowed_skills": [],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "decision-notes",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-concept-zh",
+      "language": "zh",
+      "fixture": "calculator",
+      "selection": "negative",
+      "prompt": "用一个简单的数字例子解释百分比折扣的含义。只做一般解释，不涉及这个项目，也不要访问文件。",
+      "expected_skills": [],
+      "allowed_skills": [],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "decision-notes",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    },
+    {
+      "id": "trigger-concept-en",
+      "language": "en",
+      "fixture": "calculator",
+      "selection": "negative",
+      "prompt": "Explain what a percentage discount means using a simple numeric example. Give a general explanation, unrelated to this project, without accessing files.",
+      "expected_skills": [],
+      "allowed_skills": [],
+      "forbidden_skills": [
+        "clarify-work",
+        "codebase-design",
+        "debug-work",
+        "decision-notes",
+        "git-work",
+        "handoff-work",
+        "implement-work",
+        "plan-work",
+        "review-work",
+        "tdd"
+      ]
+    }
+  ]
+}

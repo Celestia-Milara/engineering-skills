@@ -70,6 +70,48 @@ class EvaluationFixtureTests(unittest.TestCase):
         self.assertEqual(len(run["starting_tracked_diff_sha256"]), 64)
         self.assertIn("$git-work", (run_dir / "prompt.txt").read_text(encoding="utf-8"))
 
+    def test_upstream_export_uses_pinned_git_blobs_and_declared_dependencies(self):
+        source = self.root / "upstream-source"
+        source.mkdir()
+        prepare_module.git(source, "init", "--quiet")
+        for name in ("implement", "tdd", "code-review", "codebase-design"):
+            directory = source / "skills" / "engineering" / name
+            directory.mkdir(parents=True)
+            (directory / "SKILL.md").write_bytes(f"original {name}\n".encode())
+            (directory / "reference.md").write_bytes(b"fixed reference\n")
+        (source / "LICENSE").write_bytes(b"fixed upstream license\n")
+        prepare_module.git(source, "add", ".")
+        prepare_module.git(source, "commit", "--quiet", "-m", "Pinned synthetic source")
+        commit = prepare_module.git(source, "rev-parse", "HEAD")
+        # A changed working tree must not enter the upstream control group.
+        (source / "skills" / "engineering" / "implement" / "SKILL.md").write_bytes(b"uncommitted latest\n")
+        manifest = {"sources": {"mattpocock": {"commit": commit, "origin": "synthetic source"}}, "files": []}
+        project = self.root / "export"
+        project.mkdir()
+        real_read_text = Path.read_text
+
+        def read_manifest(path, *args, **kwargs):
+            return json.dumps(manifest) if path == ROOT / "sources.json" else real_read_text(path, *args, **kwargs)
+
+        with mock.patch.object(Path, "read_text", read_manifest):
+            names, exported = prepare_module.upstream_skills(project, source)
+        self.assertEqual(names, ["implement", "tdd", "code-review", "codebase-design"])
+        self.assertEqual(exported["roots"], ["implement", "tdd"])
+        self.assertEqual(exported["commit"], commit)
+        self.assertEqual((project / ".agents" / "skills" / "implement" / "SKILL.md").read_bytes(), b"original implement\n")
+        self.assertEqual((project / ".agents" / "skills" / "UPSTREAM.LICENSE").read_bytes(), b"fixed upstream license\n")
+        self.assertEqual((source / "skills" / "engineering" / "implement" / "SKILL.md").read_bytes(), b"uncommitted latest\n")
+
+    def test_claude_preparation_uses_native_skill_directory(self):
+        directory = prepare_module.prepare("debug-explicit", "full", self.root / "claude", host="claude")
+        run = json.loads((directory / "run.json").read_text(encoding="utf-8"))
+        self.assertEqual(run["host"], "claude")
+        self.assertEqual(run["skill_directory"], ".claude/skills")
+        self.assertTrue((directory / "project" / ".claude" / "skills" / "debug-work" / "SKILL.md").is_file())
+        self.assertFalse((directory / "project" / ".agents" / "skills").exists())
+        self.assertIn(".claude/skills/debug-work/SKILL.md", (directory / "prompt.txt").read_text(encoding="utf-8"))
+        self.assertEqual((directory / "project" / "AGENTS.md").read_bytes(), (directory / "project" / "CLAUDE.md").read_bytes())
+
     def test_staged_setup_rejects_paths_outside_project(self):
         suite = json.loads((ROOT / "evals" / "scenarios.json").read_text(encoding="utf-8"))
         case = next(case for case in suite["cases"] if case["id"] == "git-staged-preservation-explicit")

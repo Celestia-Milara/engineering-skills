@@ -1,6 +1,6 @@
 ---
 name: clarify-work
-description: 通过多轮追问、反例和方案取舍拷打用户，梳理项目需求、设计理由与隐含假设。适用于项目初期、新方向或用户要求 grill / 深入访谈；局部需求可轻量澄清，明确的实现任务无需先访谈。
+description: "通过多轮需求访谈（requirements interview / grill）、反例和取舍梳理模糊项目或新方向。用户要求深入采访或设计理由时使用；局部疑问可轻量澄清，明确的实现任务无需先访谈。"
 ---
 
 # Clarify Work

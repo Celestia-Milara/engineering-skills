@@ -81,7 +81,7 @@
 
 `codebase-design` 的测试保留条件与无多 agent 时的退路已在技能内定义，AGENTS 片段只提供项目级入口。
 
-`git-work` 不成为其他技能的必需依赖。共享工作区的修改与暂存保护也保留在执行技能中；任务完成不自动触发提交，项目要启用自动本地提交时在 `AGENTS.md` 明确约定。并行任务复用已有计划和交接，不新增 `.agentgit` 状态体系；工具用途和实现限制见其按需读取的 [AgentGit / Git AI 参考](skills/git-work/references/tools.md)。
+`git-work` 不成为其他技能的必需依赖。各执行入口携带经过一致性校验的 [Git 底线](skills/git-work/references/git-safety.md)，按动作读取相关章节；多人条件在 [team.md](skills/implement-work/references/team.md) 中按需加载。任务完成不自动提交，项目要启用自动本地提交时在 `AGENTS.md` 明确约定。工具用途和限制见 [AgentGit / Git AI 参考](skills/git-work/references/tools.md)。
 
 不需要为使用技能安装 Node.js。需要决策笔记自动校验时，从原 `decision-notes-skill/template/` 按原项目说明接入相应校验器，合并配置，**不要覆盖目标项目的 package.json、CI 或 AGENTS.md**。本库不复制第二套校验器，避免规则与实现分叉。
 
@@ -115,19 +115,7 @@ TS / Python 项目先从真实配置找到命令，参考 [TS / Python 验证入
 - [行为评测](evals/README.md)：固定场景、隔离项目与对照运行方式。
 - [GitHub 上传准备](docs/publication.md)：公开材料、暂存内容检查与待上传事项。
 
-维护本库时使用 Python 3.10+，按 [校验依赖](scripts/requirements.txt) 准备已有环境，再执行：
-
-```text
-python scripts/validate.py
-python scripts/validate.py --skills decision-notes,implement-work
-python -m unittest discover -s tests -v
-```
-
-检查脚本验证格式、链接、来源清单、分发哈希、许可证和必需依赖，不证明模型实际行为。选装检查不安装技能。仅使用技能不需要安装此维护工具的依赖。
-
-不要用上游更新直接覆盖改编技能。先对照 `sources.json` 的版本与修改说明，挑选需要的变化；原样复用的文件可逐文件比较后更新。许可证保留在各技能目录及 `licenses/` 中。
-
-`sources.json` 的 `source_files[].sha256` 是固定 commit 的 Git blob 字节哈希，`distributed_sha256` 是当前分发文件字节哈希。修改后审核差异、确认处理方式，再更新分发哈希；源哈希只随明确的来源升级更新。`verbatim` 表示字节一致，`translated` 表示仅翻译，改变上游规则属于 `adapted`。本库原创文件标为 `original`，`source_files` 为空数组，`skill_sources` 使用保留值 `original`，许可证映射到根目录 `LICENSE`；不为原创内容虚构上游提交或源哈希。校验器不会替你接受文件漂移。
+维护命令、哈希语义、共享条款同步及宿主调用政策见 [维护说明](docs/maintenance.md)。[评测说明](evals/README.md) 提供原始日志执行器、28 条中英自动触发提示及固定上游对照；准备或工具检查通过不等于行为通过。
 
 ## 许可证与贡献
 

@@ -20,6 +20,8 @@ except ImportError:
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 SKILL_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 FRONTMATTER_KEYS = {"name", "description", "license", "compatibility", "allowed-tools", "metadata"}
+SHARED_BLOCK = re.compile(
+    rb"<!-- shared-rule: ([a-z0-9-]+) -->\n.*?\n<!-- /shared-rule: \1 -->", re.S)
 
 
 def sha256(data: bytes) -> str:
@@ -90,7 +92,8 @@ def validate(root: Path, selected: set[str] | None = None,
     root = root.resolve()
     issues = []
     counts = {"skills": 0, "markdown_files": 0, "local_links": 0,
-              "distributed_hashes": 0, "source_blobs": 0, "licenses": 0}
+              "distributed_hashes": 0, "source_blobs": 0, "licenses": 0,
+              "shared_rules": 0, "shared_copies": 0}
 
     def error(code, path, message):
         issues.append({"code": code, "path": str(path), "message": message})
@@ -306,6 +309,72 @@ def validate(root: Path, selected: set[str] | None = None,
         expected_path = f"skills/{name}/SKILL.md"
         if expected_path not in destinations:
             error("manifest.coverage", expected_path, "Skill entrypoint has no provenance record")
+
+    # Distributed copies keep standalone installs usable; only the canonical block
+    # is maintained. Compare independently of distribution hashes so refreshing a
+    # copy's hash cannot accept divergent shared requirements.
+    shared = manifest.get("shared_rules", [])
+    if not isinstance(shared, list):
+        error("shared.schema", "shared_rules", "Expected an array")
+        shared = []
+    registered = {}
+    shared_ids = set()
+    for rule in shared:
+        if not isinstance(rule, dict) or not isinstance(rule.get("id"), str) or not SKILL_NAME.fullmatch(rule["id"]):
+            error("shared.schema", "shared_rules", "Rule requires a lower-case hyphenated id")
+            continue
+        rule_id = rule["id"]
+        if rule_id in shared_ids:
+            error("shared.schema", rule_id, "Duplicate shared rule id")
+        shared_ids.add(rule_id)
+        canonical = rule.get("canonical")
+        copies = rule.get("copies")
+        if not isinstance(copies, list) or not copies or any(not isinstance(p, str) for p in copies):
+            error("shared.schema", rule_id, "Copies must be a nonempty array of paths")
+            continue
+        blocks = []
+        for value in [canonical, *copies]:
+            path = package_path(value, rule_id)
+            if path is None:
+                blocks.append(None)
+                continue
+            key = (value, rule_id)
+            if key in registered:
+                error("shared.schema", value, "Duplicate shared member")
+            registered[key] = True
+            try:
+                data = path.read_bytes()
+                matches = [m.group(0) for m in SHARED_BLOCK.finditer(data) if m[1].decode() == rule_id]
+                if len(matches) != 1:
+                    error("shared.marker", value, f"Expected exactly one complete {rule_id} block with LF newlines")
+                    blocks.append(None)
+                else:
+                    blocks.append(matches[0])
+            except OSError as exc:
+                error("shared.read", value, str(exc))
+                blocks.append(None)
+        counts["shared_rules"] += 1
+        for value, block in zip(copies, blocks[1:]):
+            counts["shared_copies"] += 1
+            if blocks[0] is not None and block is not None and block != blocks[0]:
+                error("shared.drift", value, f"Shared rule differs from canonical: {canonical}")
+
+    shared_paths = list((root / "skills").rglob("*.md")) + list((root / "templates").rglob("*.md"))
+    if (root / "AGENTS.example.md").is_file():
+        shared_paths.append(root / "AGENTS.example.md")
+    for path in shared_paths:
+        try:
+            data = path.read_bytes()
+        except OSError:
+            continue  # Existing read checks report declared members.
+        markers = re.findall(rb"<!-- (?:/)?shared-rule: ([^\r\n]*?) -->", data)
+        blocks = list(SHARED_BLOCK.finditer(data))
+        if len(markers) != 2 * len(blocks):
+            error("shared.marker", path.relative_to(root), "Incomplete or malformed shared rule marker")
+        for marker in set(markers):
+            rule_id = marker.decode("utf-8", errors="replace")
+            if (path.relative_to(root).as_posix(), rule_id) not in registered:
+                error("shared.unregistered", path.relative_to(root), f"Unregistered shared rule: {rule_id}")
 
     for name in sorted(selected):
         source = sections["skill_sources"].get(name)

@@ -1,6 +1,6 @@
 ---
 name: codebase-design
-description: 用于设计深模块的共同词汇表。用户希望设计或改进模块的 Interface、寻找加深模块的机会、决定 Seam 的位置、提升代码的可测试性或 AI 可导航性，或其他 skill 需要深模块相关词汇时使用。
+description: "比较深模块与接口设计（deep modules / interface design / testable seams），决定复杂性归属、模块边界及可测试接缝。需要设计或改进模块接口时使用；普通局部功能或文案修改无需架构设计流程。"
 ---
 
 # Codebase Design

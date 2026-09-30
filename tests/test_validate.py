@@ -17,8 +17,10 @@ class PackageValidationTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix="engineering-skills-validation-")
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        for name in ("skills", "licenses"):
+        for name in ("skills", "licenses", "templates"):
             shutil.copytree(ROOT / name, self.root / name)
+        shutil.copy2(ROOT / "AGENTS.example.md", self.root / "AGENTS.example.md")
+        (self.root / "README.md").write_text("# Package fixture\n", encoding="utf-8")
         shutil.copy2(ROOT / "sources.json", self.root / "sources.json")
         shutil.copy2(ROOT / "LICENSE", self.root / "LICENSE")
 
@@ -81,6 +83,35 @@ class PackageValidationTests(unittest.TestCase):
         license_path = self.root / "skills" / "git-work" / "LICENSE"
         license_path.write_bytes(license_path.read_bytes() + b"\nChanged license.\n")
         self.assertIn("license.content", self.codes())
+
+    def test_shared_copy_drift_cannot_be_accepted_by_refreshing_hash(self):
+        path = self.root / "skills" / "implement-work" / "references" / "git-safety.md"
+        path.write_bytes(path.read_bytes().replace("dirty 工作区本身不要求停止。".encode(), b"Stop on any dirty tree."))
+        manifest_path = self.root / "sources.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for entry in manifest["files"]:
+            if entry["destination"] == path.relative_to(self.root).as_posix():
+                entry["distributed_sha256"] = validator.sha256(path.read_bytes())
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.assertIn("shared.drift", self.codes())
+        self.assertNotIn("hash.distributed", self.codes())
+
+    def test_shared_template_drift_is_detected(self):
+        path = self.root / "AGENTS.example.md"
+        path.write_bytes(path.read_bytes().replace("dirty 工作区本身不要求停止。".encode(), b"Always stop."))
+        self.assertIn("shared.drift", self.codes())
+
+    def test_unregistered_shared_copy_is_detected(self):
+        manifest_path = self.root / "sources.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["shared_rules"][0]["copies"].remove("templates/AGENTS.snippet.md")
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.assertIn("shared.unregistered", self.codes())
+
+    def test_broken_shared_marker_is_detected(self):
+        path = self.root / "skills" / "debug-work" / "references" / "git-safety.md"
+        path.write_bytes(path.read_bytes().replace(b"<!-- /shared-rule: git-safety -->", b""))
+        self.assertIn("shared.marker", self.codes())
 
     def test_detects_license_loss(self):
         (self.root / "skills" / "tdd" / "LICENSE").unlink()

@@ -1,0 +1,173 @@
+{
+  "format_version": 1,
+  "date": "2026-09-30",
+  "purpose": "Real-host evidence capture smoke; not a skill-performance comparison",
+  "publication": {
+    "kind": "selected-summary",
+    "raw_files": "Kept in private OS temporary run directories; full host catalogs are not published.",
+    "complete_trace_published": false
+  },
+  "runs": [
+    {
+      "id": "configured-model-refused",
+      "scenario_id": "copy-edit-negative",
+      "mode": "minimal",
+      "loading_mode": "native-discovery",
+      "requested_model": "gpt-6.1-sol",
+      "runtime": "codex-cli 0.142.5",
+      "execution_status": "host_error",
+      "skill_review_status": "not_run",
+      "elapsed_seconds": 7.0,
+      "original_stdout_sha256": "6fffc9a37aae8ea7e45add0a02e960e9700fc3c56b82adf458b7370b40774e8f",
+      "original_session_sha256": "44be0c6aafd458e95cf7a9964f3b189c7e26c1872de86b7f7ceae089c8d7f962",
+      "actual_contexts": [
+        {
+          "model": "gpt-6.1-sol",
+          "approval_policy": "never",
+          "sandbox_policy": {
+            "type": "read-only"
+          }
+        }
+      ],
+      "turn_completed_usage": [],
+      "errors": [
+        "{\"type\":\"error\",\"status\":400,\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The 'gpt-6.1-sol' model is not supported when using Codex with a ChatGPT account.\"}}",
+        {
+          "message": "{\"type\":\"error\",\"status\":400,\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The 'gpt-6.1-sol' model is not supported when using Codex with a ChatGPT account.\"}}"
+        }
+      ],
+      "stdout_parse_errors": []
+    },
+    {
+      "id": "raw-capture-readonly",
+      "scenario_id": "copy-edit-negative",
+      "mode": "minimal",
+      "loading_mode": "native-discovery",
+      "requested_model": "gpt-5.5",
+      "runtime": "codex-cli 0.142.5",
+      "execution_status": "completed",
+      "skill_review_status": "fail",
+      "elapsed_seconds": 46.235,
+      "original_stdout_sha256": "18828f3a1b8e04916fd378feaca64b6f947578b8e501fd5c215fa7a3462b0d9d",
+      "original_session_sha256": "0790813736fae8001ca7da3e1cb6336db33c9fe826af60ed195291dd68504112",
+      "actual_contexts": [
+        {
+          "model": "gpt-5.5",
+          "approval_policy": "never",
+          "sandbox_policy": {
+            "type": "read-only"
+          }
+        }
+      ],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 107219,
+          "cached_input_tokens": 87296,
+          "output_tokens": 1099,
+          "reasoning_output_tokens": 200
+        }
+      ],
+      "errors": [],
+      "stdout_parse_errors": [],
+      "source_commit": "da302b71a047d25c92f9d972479845377e21543f",
+      "tool_calls": 8,
+      "tool_results": 8,
+      "observed_loaded_project_skills": [
+        "implement-work",
+        "decision-notes"
+      ],
+      "requested_sandbox": "workspace-write",
+      "actual_sandbox": "read-only",
+      "requested_actual_match": false,
+      "artifact_changed": false,
+      "inspection": "Reviewed the original session: native actor read both project SKILL.md files, inspected the button, attempted an apply_patch, and received a read-only rejection. It did not complete Submit -> Send. No reduction in interaction or token cost is inferred.",
+      "failure_category": "host-policy",
+      "criteria": {
+        "exact-change": "fail",
+        "no-ceremony": "pass",
+        "no-commit": "pass"
+      },
+      "formal_trace_sha256": "0790813736fae8001ca7da3e1cb6336db33c9fe826af60ed195291dd68504112",
+      "comparison_eligible": false
+    },
+    {
+      "id": "explicit-windows-sandbox-timeout",
+      "scenario_id": "copy-edit-negative",
+      "mode": "minimal",
+      "loading_mode": "native-discovery",
+      "source_commit": "da302b71a047d25c92f9d972479845377e21543f",
+      "requested_model": "gpt-5.5",
+      "runtime": "codex-cli 0.142.5",
+      "execution_status": "timeout",
+      "skill_review_status": "not_run",
+      "failure_category": "execution-timeout",
+      "comparison_eligible": false,
+      "elapsed_seconds": 150.703,
+      "requested_configuration": {
+        "model": "gpt-5.5",
+        "sandbox": "workspace-write",
+        "windows_sandbox": "elevated",
+        "approval_policy": null,
+        "reasoning_effort": null
+      },
+      "configuration_comparison": {
+        "status": "not_observed",
+        "fields": {
+          "model": {
+            "requested": "gpt-5.5",
+            "observed": [
+              "gpt-5.5"
+            ],
+            "status": "match"
+          },
+          "sandbox": {
+            "requested": "workspace-write",
+            "observed": [
+              "workspace-write"
+            ],
+            "status": "match"
+          },
+          "windows_sandbox": {
+            "requested": "elevated",
+            "observed": [],
+            "status": "not_observed"
+          },
+          "approval_policy": {
+            "requested": null,
+            "observed": [
+              "never"
+            ],
+            "status": "not_requested"
+          },
+          "reasoning_effort": {
+            "requested": null,
+            "observed": [],
+            "status": "not_requested"
+          }
+        },
+        "mismatch_observed": false,
+        "requires_manual_review": true,
+        "notes": [
+          "Requested flags do not prove effective permissions or reasoning configuration.",
+          "Windows sandbox implementation cannot be inferred from sandbox_policy.type.",
+          "Matching recorded values is not proof that two runs are comparable."
+        ]
+      },
+      "original_stdout_sha256": "57d39f52cf4991ede78c1a438830f5448b7ecacb517137288e022bcfafa88f6b",
+      "original_session_sha256": "d928ca94d95e4ff9aaa6c41146ffff9526b97d603693da890d94d4c305f3816b",
+      "tool_calls": 7,
+      "tool_results": 6,
+      "artifact_changed": false,
+      "inspection": "The per-invocation Windows choice yielded recorded workspace-write, but the run exceeded 150 seconds before completing the exact text edit. Partial raw evidence is retained; no performance result is inferred."
+    }
+  ],
+  "trigger_corpus": {
+    "cases": 28,
+    "executed": 0,
+    "status": "not_run"
+  },
+  "cost_comparison": {
+    "status": "not_run",
+    "reason": "No matched before/after pair successfully completed the edit under verified writable permissions."
+  }
+}

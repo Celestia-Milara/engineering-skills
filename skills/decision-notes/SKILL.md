@@ -1,6 +1,6 @@
 ---
 name: decision-notes
-description: "维护 .agents/decisions/ 下的决策笔记:保存代码与测试无法表达的「为什么」——设计意图、不可破坏的边界、被否决的方案,供后续会话检索。做重要技术选型、改动架构边界/跨模块契约/持久化格式时写或更新笔记;修改已有代码前,或讨论「这个方案是否被否决过」时先检索约束;看到代码里的 `Decision:` 注释或 `.agents/decisions/` 目录也应使用。纯格式化、拼写、局部 bugfix 等机械改动不新建笔记。"
+description: "检索与维护 design decisions / rationale / constraints：修改已有代码或讨论历史方案时查找 .agents/decisions/ 约束；架构边界、跨模块契约、持久化格式或重要选型变化时记录代码和测试无法表达的原因。纯拼写、格式化及局部修复不新建笔记。"
 ---
 
 # Decision Notes

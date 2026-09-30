@@ -1,6 +1,6 @@
 # 可重放评测
 
-这套材料把人工场景变成固定输入、隔离工作区和可追溯证据。准备成功只表示 fixture 可用，**不表示技能行为通过**。脚本不会启动模型、付费 CLI、发布任务或修改来源仓库。
+这套材料把人工场景变成固定输入、隔离工作区和可追溯证据。准备成功只表示 fixture 可用，**不表示技能行为通过**。prepare / triggers / record 不启动模型；新增 run 必须由维护者明确执行，使用宿主账号运行隔离提示并采集原始证据，不修改来源仓库或发布任务。
 
 ## 包验证
 
@@ -62,7 +62,56 @@ python -B -X utf8 evals/prepare.py debug-explicit --mode full --model ACTUAL_MOD
 - `rubric.json`：留给评估者的断言和后续用户回答，**不要预先交给执行 agent**。
 - `run.json`：fixture/场景/技能包 SHA、分发清单 SHA、起点、文件快照、初始 index 条目和已跟踪差异的摘要哈希、模型和加载方式。初始状态始终是 `not_run`；index 摘要辅助核对初始状态，不代替完整 diff 或验证证据。
 
-支持 `baseline`（不安装本套技能）、`minimal`（decision-notes + implement-work）和 `full`（全部技能）。显式场景只有在技能实际安装时才给 prompt 加技能名与路径；其他模式使用相同业务请求。三种模式的共同项目说明相同。独立工作区不能自动屏蔽宿主的全局技能、系统指令或记忆；比较时必须记录并控制这些环境差异。
+支持 `baseline`（不安装本套技能）、`upstream`（固定上游原版）、`minimal`（decision-notes + implement-work）和 `full`（全部技能）。显式场景只有在入口实际安装时才点名；上游 implement-work 映射到原版 implement，没有对应入口时不虚构替代。各模式共同业务请求和项目说明相同。独立工作区不能自动屏蔽全局技能、系统指令或记忆；比较时记录并控制这些差异。
+
+`--host codex` 原样安装到 `.agents/skills/`；`--host claude` 安装到 `.claude/skills/`，并把共同项目说明另存为 `CLAUDE.md`。目录注入与目标宿主实际发现要分开，不用 Codex 目录假称 Claude 原生发现。
+
+## 原始宿主执行层
+
+先准备全新工作区，再显式执行 [run.py](run.py)：
+
+```powershell
+python -B -X utf8 evals/prepare.py copy-edit-negative --mode minimal --host codex --loading-mode native-discovery
+python -B -X utf8 evals/run.py C:/TEMP/RUN --host codex --model ACTUAL_SUPPORTED_MODEL --loading-mode native-discovery --timeout 180
+```
+
+模型必须是该 CLI 与账号实际支持的标识。run 探测原生可执行文件的 version/help，用参数数组和 `shell=False` 启动，不接受 batch/shell 片段。Codex 使用 JSONL、`workspace-write` sandbox，忽略用户配置以避免继承其他 sandbox 设置；保留项目说明与 execpolicy。Claude 使用 stream-json、verbose、子 agent 文字及 hook 事件、项目 settings 和 `acceptEdits`；需要人工权限的操作在 no-prompt 模式被拒绝，不绕过批准。`--executable` 可提供明确的原生 exe。
+
+这些宿主能力已对照 [Codex 非交互文档](https://learn.chatgpt.com/docs/non-interactive-mode) 与 [Claude headless 文档](https://code.claude.com/docs/en/headless)。版本变化时以实际 help 为准；不支持必需采集参数时拒绝启动，不能退回静默运行。
+
+`execution/` 保存 prompt、argv、version/help 原件、stdout JSONL、stderr、耗时、退出状态、已知全局输入哈希和最终状态。按实际 session ID 查找会话，再核验 ID 与 cwd，仅复制唯一匹配的原始 session 字节和哈希；内部 schema 不稳定，找不到时记录缺口。token/工具事件只是可取得观测，累计与增量 usage 不可相加。
+
+执行摘要还比较请求模型、sandbox 与原始 turn_context 的实际设置；匹配、不同或无法观察分别标注。请求 `workspace-write` 不证明实际可写，权限不一致的样本不进入实现成本对照。原生 Windows 已有沙箱但本次运行缺少选择时，可显式加 `--windows-sandbox elevated`（或已获准的 `unelevated`）；只覆盖当次配置，不安装、修改全局配置或自动重试。模式说明见 [Windows sandbox 文档](https://learn.chatgpt.com/docs/windows/windows-sandbox)。
+
+执行前核对 fixture、HEAD/index、prompt 和 rubric 是否仍与准备记录一致；执行目录独占创建，既有证据不覆盖。超时或取消时终止本次进程树再取最终快照，失败也保留取得的原始输出。多轮场景暂不由这个单轮执行器启动，不一次性发送未来回答；沿用人工多轮流程或增加有录制能力的宿主驱动。
+
+run 的执行状态和人工评分分开：CLI 成功退出仍保留 run.json 的 `not_run` / `not_observed`，评估者审核原始证据后再用 record 评分。只读最终快照不能排除写后删，sandbox 拦截不能直接算技能自觉守约；授权顺序需要相应消息/工具或 app-server 审批请求与响应的完整覆盖。
+
+## 自动触发测试
+
+[triggers.json](triggers.json) 固定 **28 条提示，中文/英文各 14 条**，覆盖十个入口、上下文检索和邻近负例：只规划、只评审、只讨论、文案小改，以及含“下次/计划”等词的普通翻译与一般解释。[triggers.py](triggers.py) 可列出提示或准备原生发现的全包工作区：
+
+```powershell
+python -B -X utf8 evals/triggers.py
+python -B -X utf8 evals/triggers.py trigger-copy-en --host codex
+python -B -X utf8 evals/run.py C:/TEMP/TRIGGER_RUN --host codex --model ACTUAL_SUPPORTED_MODEL --loading-mode native-discovery --timeout 180
+```
+
+期待、可选及禁止技能集合互斥且覆盖全部入口。标签只适用于本库 `full` 包，不用未安装入口给 baseline/minimal/upstream 打触发失败分；业务收益比较使用 scenarios。rubric 与选择标签在 actor 项目外，prompt 不注入技能名、路径或预期答案。使用 [官方技能评测分类](https://developers.openai.com/blog/eval-skills) 区分显式、隐式、上下文与负例。
+
+触发证据需要目标宿主的实际技能可见性与原始工具加载记录，例如 Claude Skill 调用或 Codex 读取对应 SKILL.md。仅目录存在、目录清单暴露或最终自称使用不算加载；覆盖不足的选择判据保持 `not_observed`。加载成功也不证明范围守约，另评分实际行为。完整采样后才统计每技能 precision/recall、误触发和未观察比例，不把 prepared corpus 当作触发通过率。
+
+本库暂保留正常自动选择。clarify/plan/implement 等是工作入口，decision-notes/tdd 等是可组合纪律；这一区分不等于禁用隐式调用。宿主的政策字段与维护方法见 [maintenance.md](../docs/maintenance.md)。
+
+## 固定上游对照
+
+```powershell
+python -B -X utf8 evals/prepare.py migration-authorized-explicit --mode upstream --upstream-source ../mattpocock_skills --host codex --loading-mode explicit-path
+```
+
+从 sources.json 固定 commit 导出原版 `implement` + `tdd`，包括全部目录资源、UI 政策与许可证，并提供它们引用的 `code-review` / `codebase-design`。使用 `git show` 的源 blob，记录各 blob 哈希，不复制来源仓库当前未提交文件、不升级到 latest。额外项目 issue-tracker/setup 条件仍需披露，不擅自运行 setup。
+
+固定上游 implement 禁止隐式调用且要求提交；tdd 的用户确认流程也与本版不同。保持原文，业务请求的“不提交”和既有授权优先。显式工作流收益与自动发现选择分开比较，不能把原版禁用隐式调用算作实现质量低。没有对应入口的上游场景只比较业务结果，不评价本版入口名召回率。
 
 ## 执行与记录
 
@@ -91,3 +140,5 @@ python -B -X utf8 evals/record.py C:/TEMP/RUN --trace C:/TEMP/trace.txt --model 
 [2026-09-30 Git 记录](results/2026-09-30-git-smoke.json) 包含两个新增场景的同类单次试用。父级核查提交范围、已有修改与暂存状态，并在最终提交快照复跑 8 个测试；只读场景的最终状态和验证对象说明也已核查。两例均缺少完整原始交互或工具轨迹，受影响的过程判据保留 `not_observed`，正式状态为 `inconclusive`，不把已核查的产物结果扩为整例通过。
 
 公开记录已脱敏本机用户和路径；文件头及报告 `publication` 字段说明修改范围。`evidence_sha256` 对应公开字节，`original_evidence_sha256` 对应私有备份的原始字节，不能混用。私有原件不纳入 Git。
+
+[宿主采集 smoke](results/2026-09-30-harness-smoke.json) 保存本轮真实 CLI 的精选摘要与原始字节哈希。原始 stdout/session 保留在私有临时目录，公开摘要本身不是完整轨迹。配置模型被 CLI 拒绝的样本不评分；另一次捕获完整工具调用并正式判为宿主只读限制导致的文字小改失败，不纳入技能质量或成本对照。28 条触发集尚未运行，记录保持 `not_run`。

@@ -79,3 +79,37 @@ GitHub 上传准备时，为上述记录生成了公开脱敏副本：仅替换�
 父级事后复跑仅证明该提交快照的测试结果，不证明此前操作顺序。公开证据只脱敏本机用户和临时路径，命令输出已由执行者日志归一化；最终回复保存为明确标注的摘录。原始取得的证据保留在仓库外临时 run 目录，原始与公开字节分别记录哈希。
 
 试用后仅补充 `implement-work` / `debug-work` 的最终验证窗口暂停并发写入条款；受试的 `git-work` 文件没有改变，记录中的整包哈希对应采样时版本。未重新运行之前的 10 个行为场景，未做 baseline / minimal 对照或重复采样，也未实测多 worktree 集成和冲突恢复。模板仍需目标项目填写事实与实际命令；本轮未验证宿主隐式触发、安装到用户业务项目或发布技能包。上述验证完成时，技能源码仍是本地未提交变化；临时仓库的测试提交不属于源码仓库提交。
+
+## 2026-09-30：评测执行层、触发集与共享规则
+
+本轮按评测证据、规则漂移及简单任务路径三个问题修订。缺轨迹只能说明证据不足，不能推出技能没有问题；历史 inconclusive 保持原结论，不用新工具替旧样本补判通过。
+
+### 包与工具检查
+
+- 十个技能的 quick_validate 全部通过；整包、decision-notes + implement-work 最小组合、git-work 独立选择的安装边界保持。
+- 包验证通过：24 个分发文件、10 份技能许可证；独立读取两个来源仓库时核验 17 个固定 commit blob。固定源 commit、源哈希及 LICENSE 未改，两来源仓库工作区均干净。
+- Git 底线集中在 git-work/references/git-safety.md，五个入口资源及两个 AGENTS 模板分发同一标记块。校验一份 canonical 与七份副本，拒绝内容漂移、缺标记和未登记副本；更新分发哈希也不能掩盖副本差异。
+- implement-work 的多人、共享目录及需求来源同步细节移入 references/team.md，主入口由 4,689 降至 3,492 字节（48 到 44 行）。按动作读取 Git 章节；总上下文成本仍可能受参考文件读取影响，入口字节下降不等于 token 下降。
+- 全部十个 description 补充英文任务词；保持正常自动选择，没有直接把某宿主的 explicit-only 字段加到所有入口。维护细节移至 maintenance.md。
+- 最终执行 `python -B -X utf8 -m unittest discover -s tests -v`：47 个测试通过。新增覆盖原始 JSONL/session 与 usage 采集、ID/cwd 验证、输入字节绑定、错误保留、超时/取消终止自有进程、拒覆盖、原生目录、固定上游资源及共享副本漂移。伪宿主测试不算模型行为通过。
+- 最终差异空白检查通过。维护工具仍使用 Python；仅使用技能无需 Node.js 或新增运行时。
+
+### 新评测材料
+
+[run.py](../evals/run.py) 显式启动 Codex/Claude 单轮无头模式，保存 stdout、stderr、argv、version/help、可取得的原始会话、usage 和实际权限；准备、执行和人工评分保持分离。会话 schema 不稳定，日志存在不自动证明授权顺序或全程只读；缺证据仍记 not_observed。多轮驱动尚未实现。
+
+[触发集](../evals/triggers.json) 有 28 条真实风格提示，中英文各 14 条，包含所有十个入口和邻近负例。期待/可选/禁止集合穷举且互斥，标签留在 actor 项目外，仅针对 full 包评价；场景准备和工具数据检查通过，真实触发集尚未运行。
+
+upstream 对照原样导出 sources.json 固定版本的 implement+tdd 及其 code-review/codebase-design 资源与许可证，真实来源导出已验证。原版 implement 禁用自动调用，且默认提交与 tdd 确认流程和本版不同；显式工作流与隐式选择分开比较，业务请求的授权与“不提交”优先。未完成 baseline/minimal/full/upstream 的重复行为对照，不能判断整合优于原版。
+
+### 真实宿主采集与限制
+
+[采集记录](../evals/results/2026-09-30-harness-smoke.json) 为精选摘要及原始字节哈希；完整原件在私有临时 run 中，公开摘要不冒称完整工具轨迹。
+
+本机 Codex CLI 0.142.5 拒绝配置中的 gpt-6.1-sol，记录为 host_error，未评分。随后选用该 CLI 接受的 gpt-5.5，原生发现运行拆分前的公开最小组合和按钮文字场景，取得原始会话的 8 次工具调用与 8 次结果。原始记录证明读取 implement-work/decision-notes、查找按钮以及尝试补丁，写入被实际 read-only sandbox 拒绝，index.html 仍是 Submit。逐项正式评分为 exact-change=fail、no-ceremony=pass、no-commit=pass；失败归类为宿主权限限制，不用于技能质量或成本比较。
+
+该样本请求 workspace-write，实际 turn_context 为 read-only。新执行器显式标记请求/实际策略 mismatch，并提供可选的当次 Windows sandbox 选择；不修改全局配置、安装环境、自动重试或绕过限制。早期采集元数据误称 ignore-rules 会忽略 AGENTS；官方核对后确认它针对 execpolicy，现执行器已去掉该参数与错误说明，原记录不重写。
+
+暂无成功完成修改且权限一致的拆分前后配对，交互/token 对照保持 not_run。旧 inconclusive 未改，触发准确率、整体收益、多轮授权与并行集成也没有扩大宣称为通过。
+
+另一次单独明确选择本机已有 elevated 模式的运行，在原始 turn_context 中取得 workspace-write（Windows 实现字段本身仍不可观察），但在 150 秒内未完成补丁，执行器终止本次进程树并保存部分日志。未改按钮、未获完成态 usage；该超时样本不评分或纳入前后成本对照，不继续安装或调整用户环境。
