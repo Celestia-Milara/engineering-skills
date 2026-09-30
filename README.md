@@ -6,6 +6,15 @@
 
 本版独立维护改编内容，不改两个来源仓库。无需工单系统、固定语言或包管理器，也不要求每项任务先写文档。来源、处理方式及源文件与分发文件的哈希分别记录在 `sources.json`。
 
+## 项目来源
+
+本套技能基于以下两个项目改编：
+
+- **[decision-notes-skill](https://github.com/Celestia-Milara/decision-notes-skill)**：由本项目作者 **Celestia-Milara** 维护。该项目是根据 **dsh 开发团队在开发 dsh 时使用的 notes** 改造而来的轻量版；本套技能中的 `decision-notes` 在此基础上进一步改编，用于保存长期决策的原因与约束。
+- **[mattpocock/skills](https://github.com/mattpocock/skills)**：由 **Matt Pocock** 维护。本套技能中其余 8 个 skills 均根据该项目的相关技能改造，结合本套决策记录方式调整流程、适用条件和参考材料，并进行中文改编。
+
+具体来源映射见下表，固定上游版本及文件哈希见 [sources.json](sources.json)。上游版权声明和许可证保留在各技能目录及 [来源与许可证说明](THIRD_PARTY_NOTICES.md) 中。
+
 ## 组成
 
 | Skill | 什么时候用 | 来源与处理 |
